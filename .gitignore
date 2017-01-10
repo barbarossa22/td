@@ -1,0 +1,6 @@
+.coverage
+.coveragerc
+.idea/*
+td.egg-info/*
+__pycache__/*
+*.pyc

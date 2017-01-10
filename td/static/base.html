@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8" name="viewport" content="width=device-width, initial-scale=1">
+    <title>Test</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css" integrity="sha384-rwoIResjU2yc3z8GV/NPeZWAv56rSmLldC3R/AZzGRnGxQQKnKkoFVhFQhNUwEyJ" crossorigin="anonymous">
+    <link rel="stylesheet" href="static/style.css" />
+</head>
+
+<body>
+    <div id="main" class="row">
+
+
+
+        <div id="add_item_panel" class="input-group">
+            <input id="add_item_input" type="text" class="form-control"/>
+            <span class="input-group-btn">
+                <button id="add_item_submit" class="btn btn-secondary" type="button" onclick=post_new_item()>save</button>
+            </span>
+        </div>
+
+
+        <div id="tasks_panel">
+            <ul id="tasks_list">
+            </ul>
+        </div>
+    </div>
+
+    <script src="//oss.maxcdn.com/libs/jquery/1.10.2/jquery.min.js"></script>
+    <script src="static/script.js"></script>
+</body>
+
+</html> 
