@@ -10,16 +10,16 @@ logger = logging.getLogger(__name__)
 
 @view_config(route_name='home')
 def my_view(request):
-    logger.debug("""Get request for resource at / and redirected to /todo_list
-url.""")
+    logger.debug('''Get request for resource at / and redirected to \
+/todo_list url.''')
     return HTTPFound(location='/todo_list')
 
 
 @view_config(route_name='todo_list', request_method='GET')
 def get_todo_list_page(request):
     """Return web-page base.html on /todo_list url"""
-    logger.debug("""Get request for resource at /todo_list and replied with
-file static/base.html""")
+    logger.debug('''Get request for resource at /todo_list and replied with \
+file static/base.html''')
     return FileResponse('/home/mrad/td/td/static/base.html', cache_max_age=3600)
 
 
@@ -38,12 +38,14 @@ def get_todo_list_items(request):
      null)
     """
     session = request.session
-    logger.debug("Get request for todo list items at /api/get_todo_list_items")
+    logger.debug('Get request for todo list items at /api/get_todo_list_items')
     if 'items' in session:
-        logger.debug("Found existing items in session memory, reply with {'items': %s} JSON object." % session['items'])
+        logger.debug('''Found existing items in session memory, reply with \
+{'items': %s} JSON object.''' % session['items'])
         return {'items': session['items']}
     else:
-        logger.debug('No items found in session, reply with {"items": null} JSON.')
+        logger.debug('''No items found in session, reply with {"items": null} \
+JSON.''')
         return {'items': None}
 
 

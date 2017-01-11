@@ -5,3 +5,4 @@ td.egg-info/*
 __pycache__/*
 .cache/*
 *.pyc
+td.log
