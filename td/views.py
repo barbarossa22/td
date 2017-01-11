@@ -1,5 +1,11 @@
 from pyramid.view import view_config
 from pyramid.response import FileResponse, Response
+from pyramid.httpexceptions import HTTPFound
+
+
+@view_config(route_name='home')
+def my_view(request):
+    return HTTPFound(location='/todo_list')
 
 
 @view_config(route_name='todo_list', request_method='GET')
@@ -43,10 +49,3 @@ def add_todo_list_item(request):
         session['items'] = []
         session['items'].append(request.json_body['item'])
     return Response('OK')
-
-
-'''
-@view_config(route_name='home', renderer='templates/mytemplate.pt')
-def my_view(request):
-    return {'project': 'td'}
-'''

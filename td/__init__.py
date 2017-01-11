@@ -10,7 +10,7 @@ def main(global_config, **settings):
 
     config.add_static_view('static', path='/home/mrad/td/td/static',
                           cache_max_age=3600)
-    # config.add_route('home', '/')
+    config.add_route('home', '/')
     config.add_route('todo_list', '/todo_list')
     config.add_route('get_todo_list_items', '/api/get_todo_list_items')
     config.add_route('add_todo_list_item', '/api/add_todo_list_item')
