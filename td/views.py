@@ -58,8 +58,7 @@ def add_todo_list_item(request):
     """
     session = request.session
     logger.debug('Adding item "%s" to session.' % request.json_body['item'])
-    # del session['items']
-    if 'items' in session:
+    if session.get('items'):
         session['items'].append(request.json_body['item'])
     else:
         session['items'] = []
