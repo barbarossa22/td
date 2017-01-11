@@ -1,4 +1,5 @@
 import logging
+import os
 
 from pyramid.httpexceptions import HTTPFound
 from pyramid.response import FileResponse, Response
@@ -20,7 +21,8 @@ def get_todo_list_page(request):
     """Return web-page base.html on /todo_list url"""
     logger.debug('''Get request for resource at /todo_list and replied with \
 file static/base.html''')
-    return FileResponse('/home/mrad/td/td/static/base.html', cache_max_age=3600)
+    abs_path_to_base = os.getcwd() + '/td/static/base.html'
+    return FileResponse(abs_path_to_base, cache_max_age=3600)
 
 
 @view_config(
