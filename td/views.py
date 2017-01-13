@@ -24,13 +24,10 @@ logger = logging.getLogger(__name__)
 def home(request):
     """Redirect from / to /todo_list url.
 
-    :param request: instance of pyramid.request.Request class, which is
-    created and put as arg for this function by router; represents HTTP
-    request.
-    :type request: instance
-    :returns: instance of pyramid.httpexceptions.HTTPFound exception as
-    response object with status code 302.
-    :raises: HTTPFound
+    :param request: instance-object which represents HTTP request.
+    :type: pyramid.request.Request
+    :returns: HTTPFound exception as response object with status code 302.
+    :raises: pyramid.httpexceptions.HTTPFound
 
     """
     logger.debug('''Get request for the resource at / and redirected to \
@@ -42,12 +39,10 @@ def home(request):
 def get_todo_list_page(request):
     """Return static/base.html at request on /todo_list url.
 
-    :param request: instance of pyramid.request.Request class, which is
-    created and put as arg for this function by router; represents HTTP
-    request.
-    :type request: instance
-    :returns: a FileResponse object that is used to serve a static file from
-    location static/base.html.
+    :param request: instance-object which represents HTTP request.
+    :type: pyramid.request.Request
+    :returns: object that is used to serve a file froml static/base.html.
+    :rtype: pyramid.response.FileResponse
 
     """
     logger.debug('''Get request for resource at /todo_list and replied with \
@@ -65,14 +60,16 @@ def get_todo_list_items(request):
     """Get JSON with list of todo-items from session memory at request on
     /api/get_todo_list_items url.
 
-    :param request: instance of pyramid.request.Request class, which is
-    created and put as arg for this function by router; represents HTTP
-    request.
-    :type request: instance
-    :returns: response object with included JSON-serialized string:
-    * {'items': ['sleep', 'eat', 'repeat']} if in session memory there are
-    items like 'sleep', 'eat', 'repeat' or some other user-defined notes.
-    * {'items': null} otherwise, if 'items' list doesn't exist.
+    :param request: instance-object which represents HTTP request.
+    :type: pyramid.request.Request
+    :returns: dict that is later transformed by json-renderer into response
+    object with included JSON-serialized string made from this dict:
+
+    * {'items': ['sleep', 'eat', 'repeat']} or similar user-defined notes in
+    list if they exist in session memory;
+
+    * {'items': None} otherwise, if 'items' list doesn't exist.
+    :rtype: dict
 
     """
     session = request.session
@@ -96,12 +93,10 @@ def add_todo_list_item(request):
     the list, otherwise create new 'items' list in memory and add new item to
     it.
 
-    :param request: instance of pyramid.request.Request class, which is
-    created and put as arg for this function by router; represents HTTP
-    request.
-    :type request: instance
-    :returns: instance of Response class with 'OK' string in it's body to
-    indicate a success of performed procedures.
+    :param request: instance-object which represents HTTP request.
+    :type: pyramid.request.Request
+    :returns: Response instance with 'OK' str body to indicate a success.
+    :rtype: pyramid.response.Response
 
     """
     session = request.session
