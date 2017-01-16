@@ -47,7 +47,9 @@ def get_todo_list_page(request):
     """
     logger.debug('''Get request for resource at /todo_list and replied with \
 file static/base.html''')
-    abs_path_to_base = os.getcwd() + '/td/static/base.html'
+    abs_path_to_base = ''.join(
+        [os.getcwd(), os.sep, os.path.join('td', 'static', 'base.html')]
+    )
     return FileResponse(abs_path_to_base, cache_max_age=3600)
 
 
