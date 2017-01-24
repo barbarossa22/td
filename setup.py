@@ -11,6 +11,7 @@ requires = [
     'pyramid_chameleon',
     'pyramid_debugtoolbar',
     'waitress',
+    'MySQL-python'
     ]
 
 tests_require = [
