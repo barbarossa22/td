@@ -91,7 +91,9 @@ user with ip %s''', ip
         settings.db_host, settings.db_user,
         settings.db_password, settings.db_name
     ) as db:
+        logger.debug('type of DbAssessor instance: %s', type(db))
         cursor = db.cursor
+        logger.debug(dir(db))
         cursor.execute("SELECT id FROM Users WHERE ip=%s", (ip,))
         user_id = cursor.fetchone()
         if user_id is None:

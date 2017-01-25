@@ -19,7 +19,8 @@ tests_require = [
     'pytest',  # includes virtualenv
     'pytest-cov',
     'nose',
-    'coverage'
+    'coverage',
+    'mock'
     ]
 
 setup(name='td',
