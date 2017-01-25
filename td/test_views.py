@@ -17,34 +17,10 @@ from td import views
 
 
 class TestItemsGetting(unittest.TestCase):
-    """Test views.get_todo_list_items"""
-
-    def setUp(self):
-        """Create DummyRequest for each test."""
-        self.request = testing.DummyRequest()
-        self.request.client_addr = '127.0.0.1'
-
-    def test_nonexisting_items_getting(self):
-        """Test views.get_todo_list_items with nonexisting items obj in
-        session.
-        """
-        response = views.get_todo_list_items(self.request)
-        self.assertEqual(response, {'items': None})
-
-    def test_existing_items_getting(self):
-        """Test views.get_todo_list_items with existing items obj in
-        session with value ['one', '2'].
-        """
-        self.request.session['items'] = ['one', '2']
-        response = views.get_todo_list_items(self.request)
-        self.assertEqual(response, {'items': ['one', '2']})
-
-class TestItemsGetting2(unittest.TestCase):
-    """2 Test views.get_todo_list_items with mock patches of db output."""
+    """Test views.get_todo_list_items with mock patches of db output."""
     def setUp(self):
         self.request = testing.DummyRequest()
-        self.request.client_addr = '127.0.0.1'
-
+        self.request.client_addr = '127.127.127.127'
         class EmptyObj():
             pass
         self.request.registry.settings = EmptyObj()
@@ -55,21 +31,26 @@ class TestItemsGetting2(unittest.TestCase):
 
     @mock.patch('td.views.DbAssessor')
     def test_nonexisting_items_getting(self, Assessor):
-        """2Test views.get_todo_list_items with nonexisting ip in Users
+        """Test views.get_todo_list_items with nonexisting ip in Users
         table (and that's why nonexisting items too).
         """
-        Assessor.cursor.execute.return_value = None
-        Assessor.cursor.fetchone.return_value = None
-        Assessor.cursor.fetchall.return_value = None
-        instance = Assessor.__enter__.return_value
-        #instance.cursor = mock.MagicMock()
-        #cursor = instance.cursor
-        #cursor.execute.return_value = None
-        #cursor.fetchone.return_value = None
-        #cursor.fetchall.return_value = None
-
+        fake_db = Assessor.return_value.__enter__.return_value
+        fake_db.cursor.fetchone.return_value = None
         response = views.get_todo_list_items(self.request)
         self.assertEqual(response, {'items': None})
+
+    @mock.patch('td.views.DbAssessor')
+    def test_existing_items_getting(self, Assessor):
+        """Test views.get_todo_list_items with existing items obj in
+        database with value ['one', '2'].
+        """
+        #self.request.session['items'] = ['one', '2']
+        fake_db = Assessor.return_value.__enter__.return_value
+        fake_db.cursor.fetchone.return_value = 'Not none'
+        fake_db.cursor.fetchall.return_value = (('one',),('2',))
+        response = views.get_todo_list_items(self.request)
+        self.assertEqual(response, {'items': ['one', '2']})
+
 
 
 class TestItemsAdding(unittest.TestCase):
@@ -128,13 +109,6 @@ class TestTodoListPageGetting(unittest.TestCase):
     def setUp(self):
         """Create DummyRequest for the test."""
         self.request = testing.DummyRequest()
-        self.request.client_addr = '127.0.0.1'
-        self.request.registry.settings = {}
-        self.request.registry.settings['db_host'] = 'localhost'
-        self.request.registry.settings['db_user'] = 'root'
-        self.request.registry.settings['db_password'] = '789456123'
-        self.request.registry.settings['db_name'] = 'TDDB'
-        # make it in overall module setup ?
 
     def test_page_getting(self):
         """Test views.get_todo_list_page by checking if FileResponse is done
