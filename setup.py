@@ -11,7 +11,8 @@ requires = [
     'pyramid_chameleon',
     'pyramid_debugtoolbar',
     'waitress',
-    'MySQL-python'
+    'MySQL-python',
+    'pymongo==2.9.4'
     ]
 
 tests_require = [

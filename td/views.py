@@ -11,6 +11,7 @@
 
 import logging
 import os
+import pymongo
 
 from pyramid.httpexceptions import HTTPFound
 from pyramid.response import FileResponse, Response
@@ -65,7 +66,7 @@ file static/base.html''')
     request_method='GET'
 )
 def get_todo_list_items(request):
-    """Get JSON with list of todo-items from MySQL database at request on
+    """Get JSON with list of todo-items from Mongo database at request on
     /api/get_todo_list_items url.
 
     :param request: instance-object which represents HTTP request.
@@ -96,20 +97,21 @@ user with ip %s''', ip
         user_id = cursor.fetchone()
         if user_id is None:
             logger.debug(
-                '''No items for current user found in the database, reply \
-with {"items": null} JSON.'''
+                '''This user is not in the database and that's why items for \
+him don't exist, reply with {"items": null} JSON.'''
             )
             return {'items': None}
-        cursor.execute(
-            'SELECT item from Items WHERE owner_id=%s', (user_id[0],)
+
+    client = pymongo.MongoClient(settings.mongo_host, int(settings.mongo_port))
+    db = client.TDDB
+    items_collection = db.Items
+    reply = items_collection.find({'owner_id': user_id[0]}, {'item': 1, '_id': 0})
+    items = [document['item'] for document in reply]
+    logger.debug(
+        '''Found existing items in the database, reply with {'items': %s} \
+JSON object.''', items
         )
-        select_query_output = cursor.fetchall()
-        items = [item[0] for item in select_query_output]
-        logger.debug(
-            '''Found existing items in the database, reply with \
-{'items': %s} JSON object.''', items
-        )
-        return {'items': items}
+    return {'items': items}
 
 
 @view_config(route_name='add_todo_list_item', request_method='POST')
@@ -117,9 +119,10 @@ def add_todo_list_item(request):
     """ Add new item to the database.
 
     When request with POST method at /api/add_todo_list_item arrives then
-    function checks if user's ip exists in the databases table 'Users'. If no
-    then it creates new entry for him in 'Users' table and after that appends
-    to the table 'Items' his todo list item from POST json body.
+    function checks if user's ip exists in the MySQL database table 'Users'. If
+    no then it creates new entry for him in 'Users' MySQL table and after that
+    appends to the 'Items' collection his todo list item from POST json body
+    in Mongo database.
 
     :param request: instance-object which represents HTTP request.
     :type: pyramid.request.Request
@@ -129,8 +132,9 @@ def add_todo_list_item(request):
     """
     settings = request.registry.settings
     ip = request.client_addr
-    logger.debug('User with ip %s is trying to add new items with POST \
+    logger.debug('User with ip %s is trying to add new item with POST \
 request on /api/add_todo_list_items', ip)
+
 
     with DbAssessor(
         settings.db_host, settings.db_user,
@@ -140,23 +144,26 @@ request on /api/add_todo_list_items', ip)
 
         cursor.execute("SELECT id FROM Users WHERE ip=%s", (ip,))
         user_id = cursor.fetchone()
+
         if user_id is None:
             logger.debug('''User with such ip does not exist in the database,\
             creating new entry for him in Users table''')
             cursor.execute("INSERT INTO Users(ip) VALUES (%s)", (ip,))
             cursor.execute("SELECT id FROM Users WHERE ip=%s", (ip,))
-            user_id = cursor.fetchone()[0]
-
-        cursor.execute(
-            "INSERT INTO Items(item, owner_id) VALUES (%s, %s)",
-            (request.json_body['item'], user_id)
-        )
+            user_id = cursor.fetchone()
 
         db.commit()
 
-        logger.debug(
-            'Successfully added item "%s" to the database.',
-            request.json_body['item']
-        )
+    client = pymongo.MongoClient(settings.mongo_host, int(settings.mongo_port))
+    db = client.TDDB
+    items_collection = db.Items
+    items_collection.insert_one(
+        {'item': request.json_body['item'] , 'owner_id': user_id[0]}
+    )
+
+    logger.debug(
+        'Successfully added item "%s" to the database.',
+        request.json_body['item']
+    )
 
     return Response('OK')
