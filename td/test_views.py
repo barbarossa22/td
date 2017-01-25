@@ -21,7 +21,8 @@ class TestItemsGetting(unittest.TestCase):
     def setUp(self):
         self.request = testing.DummyRequest()
         self.request.client_addr = '127.127.127.127'
-        class EmptyObj():
+
+        class EmptyObj:
             pass
         self.request.registry.settings = EmptyObj()
         self.request.registry.settings.db_host = 'localhost'
@@ -30,27 +31,25 @@ class TestItemsGetting(unittest.TestCase):
         self.request.registry.settings.db_name = 'TDDB'
 
     @mock.patch('td.views.DbAssessor')
-    def test_nonexisting_items_getting(self, Assessor):
+    def test_nonexisting_items_getting(self, assessor):
         """Test views.get_todo_list_items with nonexisting ip in Users
         table (and that's why nonexisting items too).
         """
-        fake_db = Assessor.return_value.__enter__.return_value
+        fake_db = assessor.return_value.__enter__.return_value
         fake_db.cursor.fetchone.return_value = None
         response = views.get_todo_list_items(self.request)
         self.assertEqual(response, {'items': None})
 
     @mock.patch('td.views.DbAssessor')
-    def test_existing_items_getting(self, Assessor):
+    def test_existing_items_getting(self, assessor):
         """Test views.get_todo_list_items with existing items obj in
         database with value ['one', '2'].
         """
-        #self.request.session['items'] = ['one', '2']
-        fake_db = Assessor.return_value.__enter__.return_value
+        fake_db = assessor.return_value.__enter__.return_value
         fake_db.cursor.fetchone.return_value = 'Not none'
-        fake_db.cursor.fetchall.return_value = (('one',),('2',))
+        fake_db.cursor.fetchall.return_value = (('one',), ('2',))
         response = views.get_todo_list_items(self.request)
         self.assertEqual(response, {'items': ['one', '2']})
-
 
 
 class TestItemsAdding(unittest.TestCase):
@@ -92,7 +91,6 @@ class TestHomeIndex(unittest.TestCase):
         """Create DummyRequest for the test."""
         self.request = testing.DummyRequest()
         self.request.client_addr = '127.0.0.1'
-
 
     def test_redirection(self):
         """Test views.home by checking if redirection to /todo_list url was
