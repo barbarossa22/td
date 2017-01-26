@@ -43,9 +43,10 @@ class DbAssessor(object):
 
         :return: MySQLdb connection object.
         """
-        self.db = MySQLdb.connect(
-            self.host, self.user, self.password, self.db_name
-        )
+        self.db = MySQLdb.connect(self.host,
+                                  self.user,
+                                  self.password,
+                                  self.db_name)
         self.db.cursor = self.db.cursor()
         return self.db
 
