@@ -63,7 +63,7 @@ class TestItemsAdding(unittest.TestCase):
         response = views.add_todo_list_item(self.request)
         self.assertIn("items", self.request.session)
         self.assertEqual(self.request.session.get("items"),
-                        ["old item", "wake up"])
+                         ["old item", "wake up"])
         self.assertEqual(response.body, "OK")
 
 

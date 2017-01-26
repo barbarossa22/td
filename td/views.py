@@ -17,7 +17,7 @@ from pyramid.httpexceptions import HTTPFound
 from pyramid.response import FileResponse, Response
 from pyramid.view import view_config
 
-from td.assessors.assessors import DbAssessor
+from td.assessors.assessors import MySQLDbAssessor
 
 
 logger = logging.getLogger(__name__)
@@ -81,10 +81,10 @@ def get_todo_list_items(request):
     logger.debug("Get request for todo list items at "
                  "/api/get_todo_list_items from user with ip %s",
                  ip)
-    with DbAssessor(settings.db_host,
-                    settings.db_user,
-                    settings.db_password,
-                    settings.db_name) as db:
+    with MySQLDbAssessor(settings.mysql_host,
+                         settings.mysql_user,
+                         settings.mysql_password,
+                         settings.mysql_db_name) as db:
         cursor = db.cursor
         cursor.execute("SELECT id FROM Users WHERE ip=%s", (ip,))
         user_id = cursor.fetchone()
@@ -129,10 +129,10 @@ def add_todo_list_item(request):
                  "request on /api/add_todo_list_items",
                  ip)
 
-    with DbAssessor(settings.db_host,
-                    settings.db_user,
-                    settings.db_password,
-                    settings.db_name) as db:
+    with MySQLDbAssessor(settings.mysql_host,
+                         settings.mysql_user,
+                         settings.mysql_password,
+                         settings.mysql_db_name) as db:
         cursor = db.cursor
 
         cursor.execute("SELECT id FROM Users WHERE ip=%s", (ip,))

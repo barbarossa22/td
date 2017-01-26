@@ -12,7 +12,8 @@ requires = [
     'pyramid_debugtoolbar',
     'waitress',
     'MySQL-python',
-    'pymongo==2.9.4'
+    'pymongo==2.9.4',
+    'psycopg2'
     ]
 
 tests_require = [
