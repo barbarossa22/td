@@ -17,7 +17,7 @@ from pyramid.httpexceptions import HTTPFound
 from pyramid.response import FileResponse, Response
 from pyramid.view import view_config
 
-from td.assessors.assessors import MySQLDbAssessor
+from td.assessors.assessors import PgresDbAssessor
 
 
 logger = logging.getLogger(__name__)
@@ -33,7 +33,7 @@ def home(request):
     :raises: pyramid.httpexceptions.HTTPFound
 
     """
-    logger.debug("Get request for the resource at / and redirected to"
+    logger.debug("Get request for the resource at / and redirected to "
                  "/todo_list url.")
     return HTTPFound(location="/todo_list")
 
@@ -48,7 +48,7 @@ def get_todo_list_page(request):
     :rtype: pyramid.response.FileResponse
 
     """
-    logger.debug("Get request for resource at /todo_list and replied with"
+    logger.debug("Get request for resource at /todo_list and replied with "
                  "file static/base.html")
     abs_path_to_base = "".join([os.path.dirname(__file__),
                                 os.sep,
@@ -81,17 +81,18 @@ def get_todo_list_items(request):
     logger.debug("Get request for todo list items at "
                  "/api/get_todo_list_items from user with ip %s",
                  ip)
-    with MySQLDbAssessor(settings.mysql_host,
-                         settings.mysql_user,
-                         settings.mysql_password,
-                         settings.mysql_db_name) as db:
-        cursor = db.cursor
-        cursor.execute("SELECT id FROM Users WHERE ip=%s", (ip,))
+
+    with PgresDbAssessor(settings.pgres_db_name,
+                         settings.pgres_user,
+                         settings.pgres_host,
+                         settings.pgres_password) as db:
+        cursor = db.cursor()
+        cursor.execute('SELECT id FROM "Users" WHERE ip=%s', (ip,))
         user_id = cursor.fetchone()
 
         if user_id is None:
-            logger.debug("This user is not in the database and that's why"
-                         "items for him don't exist, reply with"
+            logger.debug("This user is not in the database and that's why "
+                         "items for him don't exist, reply with "
                          "{'items': null} JSON.")
             return {"items": None}
 
@@ -101,7 +102,7 @@ def get_todo_list_items(request):
     reply = items_collection.find({"owner_id": user_id[0]},
                                   {"item": 1, "_id": 0})
     items = [document["item"] for document in reply]
-    logger.debug("Found existing items in the database, reply with"
+    logger.debug("Found existing items in the database, reply with "
                  "{'items': %s} JSON object.",
                  items)
     return {"items": items}
@@ -125,24 +126,24 @@ def add_todo_list_item(request):
     """
     settings = request.registry.settings
     ip = request.client_addr
-    logger.debug("User with ip %s is trying to add new item with POST"
+    logger.debug("User with ip %s is trying to add new item with POST "
                  "request on /api/add_todo_list_items",
                  ip)
 
-    with MySQLDbAssessor(settings.mysql_host,
-                         settings.mysql_user,
-                         settings.mysql_password,
-                         settings.mysql_db_name) as db:
-        cursor = db.cursor
+    with PgresDbAssessor(settings.pgres_db_name,
+                         settings.pgres_user,
+                         settings.pgres_host,
+                         settings.pgres_password) as db:
+        cursor = db.cursor()
 
-        cursor.execute("SELECT id FROM Users WHERE ip=%s", (ip,))
+        cursor.execute('SELECT id FROM "Users" WHERE ip=%s', (ip,))
         user_id = cursor.fetchone()
 
         if user_id is None:
-            logger.debug("User with such ip does not exist in the database,"
+            logger.debug("User with such ip does not exist in the database, "
                          "creating new entry for him in Users table")
-            cursor.execute("INSERT INTO Users(ip) VALUES (%s)", (ip,))
-            cursor.execute("SELECT id FROM Users WHERE ip=%s", (ip,))
+            cursor.execute('INSERT INTO "Users"(ip) VALUES (%s)', (ip,))
+            cursor.execute('SELECT id FROM "Users" WHERE ip=%s', (ip,))
             user_id = cursor.fetchone()
 
         db.commit()
