@@ -113,10 +113,10 @@ def add_todo_list_item(request):
     """ Add new item to the database.
 
     When request with POST method at /api/add_todo_list_item arrives then
-    function checks if user's ip exists in the MySQL database table 'Users'. If
-    no then it creates new entry for him in 'Users' MySQL table and after that
-    appends to the 'Items' collection his todo list item from POST json body
-    in Mongo database.
+    function checks if user's ip exists in the Postgres database table 'Users'.
+    If no then it creates new entry for him in 'Users' Postgres table and after
+    that appends to the 'Items' collection his todo list item from POST json
+    body in Mongo database.
 
     :param request: instance-object which represents HTTP request.
     :type: pyramid.request.Request
