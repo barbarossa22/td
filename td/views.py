@@ -17,7 +17,7 @@ from pyramid.httpexceptions import HTTPFound
 from pyramid.response import FileResponse, Response
 from pyramid.view import view_config
 
-from td.assessors.assessors import PgresDbAssessor
+from td.assessors.assessors import Connector
 
 
 logger = logging.getLogger(__name__)
@@ -81,25 +81,18 @@ def get_todo_list_items(request):
     logger.debug("Get request for todo list items at "
                  "/api/get_todo_list_items from user with ip %s",
                  ip)
-
-    with PgresDbAssessor(settings.pgres_db_name,
-                         settings.pgres_user,
-                         settings.pgres_host,
-                         settings.pgres_password) as db:
-        cursor = db.cursor()
-        cursor.execute('SELECT id FROM "Users" WHERE ip=%s', (ip,))
-        user_id = cursor.fetchone()
-
-        if user_id is None:
-            logger.debug("This user is not in the database and that's why "
-                         "items for him don't exist, reply with "
-                         "{'items': null} JSON.")
-            return {"items": None}
+    db = Connector("postgres")
+    user_id = db.select_one("id", "Users", "ip='%s'" % ip)[0]
+    if user_id is None:
+        logger.debug("This user is not in the database and that's why "
+                     "items for him don't exist, reply with "
+                     "{'items': null} JSON.")
+        return {"items": None}
 
     client = pymongo.MongoClient(settings.mongo_host, int(settings.mongo_port))
     db = client.TDDB
     items_collection = db.Items
-    reply = items_collection.find({"owner_id": user_id[0]},
+    reply = items_collection.find({"owner_id": user_id},
                                   {"item": 1, "_id": 0})
     items = [document["item"] for document in reply]
     logger.debug("Found existing items in the database, reply with "
@@ -130,29 +123,19 @@ def add_todo_list_item(request):
                  "request on /api/add_todo_list_items",
                  ip)
 
-    with PgresDbAssessor(settings.pgres_db_name,
-                         settings.pgres_user,
-                         settings.pgres_host,
-                         settings.pgres_password) as db:
-        cursor = db.cursor()
-
-        cursor.execute('SELECT id FROM "Users" WHERE ip=%s', (ip,))
-        user_id = cursor.fetchone()
-
-        if user_id is None:
-            logger.debug("User with such ip does not exist in the database, "
-                         "creating new entry for him in Users table")
-            cursor.execute('INSERT INTO "Users"(ip) VALUES (%s)', (ip,))
-            cursor.execute('SELECT id FROM "Users" WHERE ip=%s', (ip,))
-            user_id = cursor.fetchone()
-
-        db.commit()
+    db = Connector("postgres")
+    user_id = db.select_one("id", "Users", "ip='%s'" % ip)
+    if user_id is None:
+        logger.debug("User with such ip does not exist in the database, "
+                     "creating new entry for him in Users table")
+        db.insert("Users", "ip", ip)
+        user_id = db.select_one("id", "Users", "ip='%s'" % ip)[0]
 
     client = pymongo.MongoClient(settings.mongo_host, int(settings.mongo_port))
     db = client.TDDB
     items_collection = db.Items
     items_collection.insert_one({"item": request.json_body["item"],
-                                 "owner_id": user_id[0]})
+                                 "owner_id": user_id})
 
     logger.debug("Successfully added item '%s' to the database.",
                  request.json_body["item"])

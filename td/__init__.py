@@ -4,6 +4,7 @@
 
 """
 
+from ConfigParser import SafeConfigParser
 from pyramid.config import Configurator
 from pyramid.session import SignedCookieSessionFactory
 
@@ -11,6 +12,12 @@ from pyramid.session import SignedCookieSessionFactory
 def main(global_config, **settings):
     """ This function returns a Pyramid WSGI application.
     """
+
+    parser = SafeConfigParser()
+    parser.read(global_config['__file__'])
+    for k, v in parser.items('databases'):
+        settings[k] = v
+
     config = Configurator(settings=settings)
 
     config.add_static_view("static",

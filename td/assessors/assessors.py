@@ -138,10 +138,10 @@ class Connector(object):
         settings = registry.settings
 
         try:
-            return {'dbname': settings['{}_db_name'.format(engine_type)],
-                    'user': settings['{}_user'.format(engine_type)],
-                    'host': settings['{}_host'.format(engine_type)],
-                    'password': settings['{}_password'.format(engine_type)]}
+            return {"dbname": settings["{}_db_name".format(engine_type)],
+                    "user": settings["{}_user".format(engine_type)],
+                    "host": settings["{}_host".format(engine_type)],
+                    "password": settings["{}_password".format(engine_type)]}
         except KeyError:
             raise WrongEngineException(self.ERROR_MESSAGE)
 
@@ -152,7 +152,7 @@ class Connector(object):
         Returns a tuple including string elements in it: ('1', 'User1'). If no
         data in the table for executed query then return value is None.
 
-        :param column_names: column names in the table.
+        :param column_names: column names in the table to select.
         :type column_names: str.
         :param table: table name in the db.in  t
         :type table: str.
@@ -161,17 +161,17 @@ class Connector(object):
         :return: tuple representing single row or None if no data in db.
         :raises: WrongEngineException
         """
-        if self.engine_type == 'mysql':
+        if self.engine_type == "mysql":
             output = self.__exec_mysql_selection(column_names,
                                                  table,
                                                  where_clause,
-                                                 how_many='one')
+                                                 how_many="one")
             return output
-        elif self.engine_type == 'postgres':
+        elif self.engine_type == "postgres":
             output = self.__exec_pgres_selection(column_names,
                                                  table,
                                                  where_clause,
-                                                 how_many='one')
+                                                 how_many="one")
             return output
         else:
             raise WrongEngineException(self.ERROR_MESSAGE)
@@ -184,7 +184,7 @@ class Connector(object):
         (('1', 'User1'), ('2', 'User2')). If there is no data in the table for
         executed query then function returns single tuple ().
 
-        :param column_names: column names in the table.
+        :param column_names: column names in the table to select.
         :type column_names: str.
         :param table: table name in the db.
         :type table: str.
@@ -193,17 +193,17 @@ class Connector(object):
         :return: tuple with all rows as included elements-tuples in it.
         :raises: WrongEngineException
         """
-        if self.engine_type == 'mysql':
+        if self.engine_type == "mysql":
             output = self.__exec_mysql_selection(column_names,
                                                  table,
                                                  where_clause,
-                                                 how_many='all')
+                                                 how_many="all")
             return output
-        elif self.engine_type == 'postgres':
+        elif self.engine_type == "postgres":
             output = self.__exec_pgres_selection(column_names,
                                                  table,
                                                  where_clause,
-                                                 how_many='all')
+                                                 how_many="all")
             return output
         else:
             raise WrongEngineException(self.ERROR_MESSAGE)
@@ -212,7 +212,7 @@ class Connector(object):
                                column_names,
                                table,
                                where_clause=None,
-                               how_many='all'):
+                               how_many="all"):
         """
         Execute select query in mysql database.
 
@@ -226,7 +226,7 @@ class Connector(object):
         tuple including string elements in it: ('1', 'User1'). If no data in
         the table for executed query then return value is None.
 
-        :param column_names: column names in the table.
+        :param column_names: column names in the table to select.
         :type column_names: str.
         :param table: table name in the db.
         :type table: str.
@@ -236,18 +236,18 @@ class Connector(object):
         :type how_many: str.
         :return: tuple with fetched data from selected query.
         """
-        with MySQLDbAssessor(self.__credentials_dict['host'],
-                             self.__credentials_dict['user'],
-                             self.__credentials_dict['password'],
-                             self.__credentials_dict['dbname']) as db:
+        with MySQLDbAssessor(self.__credentials_dict["host"],
+                             self.__credentials_dict["user"],
+                             self.__credentials_dict["password"],
+                             self.__credentials_dict["dbname"]) as db:
             cursor = db.cursor
             if where_clause is None:
-                cursor.execute('SELECT %s FROM %s' % (column_names, table))
+                cursor.execute("SELECT %s FROM %s" % (column_names, table))
             else:
-                cursor.execute('SELECT %s FROM %s WHERE %s' % (column_names,
+                cursor.execute("SELECT %s FROM %s WHERE %s" % (column_names,
                                                                table,
                                                                where_clause))
-            if how_many == 'all':
+            if how_many == "all":
                 return cursor.fetchall()
             else:
                 return cursor.fetchone()
@@ -256,7 +256,7 @@ class Connector(object):
                                column_names,
                                table,
                                where_clause=None,
-                               how_many='all'):
+                               how_many="all"):
         """
         Execute select query in postgres database.
 
@@ -270,20 +270,20 @@ class Connector(object):
         tuple including string elements in it: ('1', 'User1'). If no data in
         the table for executed query then return value is None.
 
-        :param column_names: column names in the table.
+        :param column_names: column names in the table to select.
         :type column_names: str.
-        :param table: table name in the db.
+        :param table: table name in the db to select from.
         :type table: str.
         :param where_clause: condition for sql where clause.
         :type where_clause: str.
         :param how_many: defines selection of only first row or all rows.
         :type how_many: str.
-        :return:
+        :return: tuple with fetched data from selected query.
         """
-        with PgresDbAssessor(self.__credentials_dict['dbname'],
-                             self.__credentials_dict['user'],
-                             self.__credentials_dict['host'],
-                             self.__credentials_dict['password']) as db:
+        with PgresDbAssessor(self.__credentials_dict["dbname"],
+                             self.__credentials_dict["user"],
+                             self.__credentials_dict["host"],
+                             self.__credentials_dict["password"]) as db:
             cursor = db.cursor()
             if where_clause is None:
                 cursor.execute('SELECT %s FROM "%s"' % (column_names, table))
@@ -291,7 +291,85 @@ class Connector(object):
                 cursor.execute('SELECT %s FROM "%s" WHERE %s' % (column_names,
                                                                  table,
                                                                  where_clause))
-            if how_many == 'all':
+            if how_many == "all":
                 return tuple(cursor.fetchall())
             else:
                 return cursor.fetchone()
+
+    def insert(self, table, column_names, values):
+        """Execute insert statement into database.
+
+        It is expected to have args in the next format:
+        .insert("Users", "id, name", "1, Jonathan Swift")
+        .insert("Users", "name", "Jonathan Swift")
+
+        :param table: table name in the db for insert operation.
+        :type table: str.
+        :param column_names: column names in the table to affect.
+        :type column_names: str.
+        :param values: values to be inserted
+        :type values: str.
+        :return: None
+        :raises: WrongEngineException
+        """
+
+        if self.engine_type == "mysql":
+            self.__exec_mysql_insertion(table, column_names, values)
+        elif self.engine_type == "postgres":
+            self.__exec_pgres_insertion(table, column_names, values)
+        else:
+            raise WrongEngineException(self.ERROR_MESSAGE)
+
+    def __exec_mysql_insertion(self, table, column_names, values):
+        """Execute insert statement into mysql database.
+
+        It is expected to have args in the next format:
+        .insert("Users", "id, name", "1, Jonathan Swift")
+        .insert("Users", "name", "Jonathan Swift")
+
+        :param table: table name in the db for insert operation.
+        :type table: str.
+        :param column_names: column names in the table to affect.
+        :type column_names: str.
+        :param values: values to be inserted
+        :type values: str.
+        :return: None
+        :raises: WrongEngineException
+        """
+        with MySQLDbAssessor(self.__credentials_dict["host"],
+                             self.__credentials_dict["user"],
+                             self.__credentials_dict["password"],
+                             self.__credentials_dict["dbname"]) as db:
+            cursor = db.cursor
+            values = str(tuple(values.split(", ")))
+            cursor.execute("INSERT INTO %s(%s) VALUES %s" % (table,
+                                                             column_names,
+                                                             values))
+            db.commit()
+
+    def __exec_pgres_insertion(self, table, column_names, values):
+        """Execute insert statement into postgres database.
+
+        It is expected to have args in the next format:
+        .insert("Users", "id, name", "1, Jonathan Swift")
+        .insert("Users", "name", "Jonathan Swift")
+
+        :param table: table name in the db for insert operation.
+        :type table: str.
+        :param column_names: column names in the table to affect.
+        :type column_names: str.
+        :param values: values to be inserted
+        :type values: str.
+        :return: None
+        :raises: WrongEngineException
+        """
+        with PgresDbAssessor(self.__credentials_dict["dbname"],
+                             self.__credentials_dict["user"],
+                             self.__credentials_dict["host"],
+                             self.__credentials_dict["password"]) as db:
+            cursor = db.cursor()
+            values = str(tuple(values.split(", ")))
+            cursor.execute('INSERT INTO "%s"(%s) VALUES %s' % (table,
+                                                               column_names,
+                                                               values))
+            db.commit()
