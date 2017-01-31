@@ -132,6 +132,7 @@ class Connector(object):
         :param engine_type: Type of engine (mysql or postgres).
         :type engine_type: str.
         :return: dictionary with db credentials and settings.
+        :rtype: dict
         :raises: WrongEngineException
         """
         registry = get_current_registry()
@@ -159,6 +160,7 @@ class Connector(object):
         :param where_clause: condition for sql where clause.
         :type where_clause: str.
         :return: tuple representing single row or None if no data in db.
+        :rtype: tuple
         :raises: WrongEngineException
         """
         if self.engine_type == "mysql":
@@ -191,6 +193,7 @@ class Connector(object):
         :param where_clause: condition for sql where clause.
         :type where_clause: str.
         :return: tuple with all rows as included elements-tuples in it.
+        :rtype: tuple
         :raises: WrongEngineException
         """
         if self.engine_type == "mysql":
@@ -235,6 +238,7 @@ class Connector(object):
         :param how_many: defines selection of only first row or all rows.
         :type how_many: str.
         :return: tuple with fetched data from selected query.
+        :rtype: tuple
         """
         with MySQLDbAssessor(self.__credentials_dict["host"],
                              self.__credentials_dict["user"],
@@ -279,6 +283,7 @@ class Connector(object):
         :param how_many: defines selection of only first row or all rows.
         :type how_many: str.
         :return: tuple with fetched data from selected query.
+        :rtype: tuple
         """
         with PgresDbAssessor(self.__credentials_dict["dbname"],
                              self.__credentials_dict["user"],
@@ -310,6 +315,7 @@ class Connector(object):
         :param values: values to be inserted
         :type values: str.
         :return: None
+        :rtype: None
         :raises: WrongEngineException
         """
 
@@ -334,6 +340,7 @@ class Connector(object):
         :param values: values to be inserted
         :type values: str.
         :return: None
+        :rtype: None
         :raises: WrongEngineException
         """
         with MySQLDbAssessor(self.__credentials_dict["host"],
@@ -361,6 +368,7 @@ class Connector(object):
         :param values: values to be inserted
         :type values: str.
         :return: None
+        :rtype: None
         :raises: WrongEngineException
         """
         with PgresDbAssessor(self.__credentials_dict["dbname"],

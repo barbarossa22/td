@@ -13,7 +13,8 @@ requires = [
     'waitress',
     'MySQL-python',
     'pymongo==2.9.4',
-    'psycopg2'
+    'psycopg2',
+    'Sphinx'
     ]
 
 tests_require = [
