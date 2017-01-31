@@ -145,31 +145,33 @@ class Connector(object):
         except KeyError:
             raise WrongEngineException(self.ERROR_MESSAGE)
 
-
     def select_one(self, column_names, table, where_clause=None):
         """
         Execute select query and return from it's output first row.
 
-        :param column_names:
+        Returns a tuple including string elements in it: ('1', 'User1'). If no
+        data in the table for executed query then return value is None.
+
+        :param column_names: column names in the table.
         :type column_names: str.
-        :param table:
+        :param table: table name in the db.in  t
         :type table: str.
-        :param where_clause:
+        :param where_clause: condition for sql where clause.
         :type where_clause: str.
-        :return:
+        :return: tuple representing single row or None if no data in db.
         :raises: WrongEngineException
         """
         if self.engine_type == 'mysql':
             output = self.__exec_mysql_selection(column_names,
                                                  table,
                                                  where_clause,
-                                                 how_much='one')
+                                                 how_many='one')
             return output
         elif self.engine_type == 'postgres':
             output = self.__exec_pgres_selection(column_names,
                                                  table,
                                                  where_clause,
-                                                 how_much='one')
+                                                 how_many='one')
             return output
         else:
             raise WrongEngineException(self.ERROR_MESSAGE)
@@ -178,26 +180,30 @@ class Connector(object):
         """
         Execute select query and return from it's output all rows.
 
-        :param column_names:
+        Output is a tuple with included tuples in it representing rows:
+        (('1', 'User1'), ('2', 'User2')). If there is no data in the table for
+        executed query then function returns single tuple ().
+
+        :param column_names: column names in the table.
         :type column_names: str.
-        :param table:
+        :param table: table name in the db.
         :type table: str.
-        :param where_clause:
+        :param where_clause: condition for sql where clause.
         :type where_clause: str.
-        :return:
+        :return: tuple with all rows as included elements-tuples in it.
         :raises: WrongEngineException
         """
         if self.engine_type == 'mysql':
             output = self.__exec_mysql_selection(column_names,
                                                  table,
                                                  where_clause,
-                                                 how_much='many')
+                                                 how_many='all')
             return output
         elif self.engine_type == 'postgres':
             output = self.__exec_pgres_selection(column_names,
                                                  table,
                                                  where_clause,
-                                                 how_much='many')
+                                                 how_many='all')
             return output
         else:
             raise WrongEngineException(self.ERROR_MESSAGE)
@@ -206,19 +212,29 @@ class Connector(object):
                                column_names,
                                table,
                                where_clause=None,
-                               how_much='many'):
+                               how_many='all'):
         """
         Execute select query in mysql database.
 
-        :param column_names:
+        In case when how_many arg is equal to 'all' then function fetches all
+        rows from select query. Output is a tuple with included tuples in it
+        representing rows: (('1', 'User1'), ('2', 'User2')). If there is no
+        data in the table for executed query then function returns single
+        tuple ().
+
+        For all other values of how_many arg only one first row is fetched as a
+        tuple including string elements in it: ('1', 'User1'). If no data in
+        the table for executed query then return value is None.
+
+        :param column_names: column names in the table.
         :type column_names: str.
-        :param table:
+        :param table: table name in the db.
         :type table: str.
-        :param where_clause:
+        :param where_clause: condition for sql where clause.
         :type where_clause: str.
-        :param how_much:
-        :type how_much: str.
-        :return:
+        :param how_many: defines selection of only first row or all rows.
+        :type how_many: str.
+        :return: tuple with fetched data from selected query.
         """
         with MySQLDbAssessor(self.__credentials_dict['host'],
                              self.__credentials_dict['user'],
@@ -231,7 +247,7 @@ class Connector(object):
                 cursor.execute('SELECT %s FROM %s WHERE %s' % (column_names,
                                                                table,
                                                                where_clause))
-            if how_much == 'many':
+            if how_many == 'all':
                 return cursor.fetchall()
             else:
                 return cursor.fetchone()
@@ -240,18 +256,28 @@ class Connector(object):
                                column_names,
                                table,
                                where_clause=None,
-                               how_much='many'):
+                               how_many='all'):
         """
         Execute select query in postgres database.
 
-        :param column_names:
+        In case when how_many arg is equal to 'all' then function fetches all
+        rows from select query. Output is a tuple with included tuples in it
+        representing rows: (('1', 'User1'), ('2', 'User2')). If there is no
+        data in the table for executed query then function returns single
+        tuple ().
+
+        For all other values of how_many arg only one first row is fetched as a
+        tuple including string elements in it: ('1', 'User1'). If no data in
+        the table for executed query then return value is None.
+
+        :param column_names: column names in the table.
         :type column_names: str.
-        :param table:
+        :param table: table name in the db.
         :type table: str.
-        :param where_clause:
+        :param where_clause: condition for sql where clause.
         :type where_clause: str.
-        :param how_much:
-        :type how_much: str.
+        :param how_many: defines selection of only first row or all rows.
+        :type how_many: str.
         :return:
         """
         with PgresDbAssessor(self.__credentials_dict['dbname'],
@@ -262,8 +288,10 @@ class Connector(object):
             if where_clause is None:
                 cursor.execute('SELECT %s FROM "%s"' % (column_names, table))
             else:
-                cursor.execute('SELECT %s FROM "%s" WHERE %s')
-            if how_much == 'many':
-                return cursor.fetchall()
+                cursor.execute('SELECT %s FROM "%s" WHERE %s' % (column_names,
+                                                                 table,
+                                                                 where_clause))
+            if how_many == 'all':
+                return tuple(cursor.fetchall())
             else:
                 return cursor.fetchone()
