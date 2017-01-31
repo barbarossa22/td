@@ -348,7 +348,11 @@ class Connector(object):
                              self.__credentials_dict["password"],
                              self.__credentials_dict["dbname"]) as db:
             cursor = db.cursor
-            values = str(tuple(values.split(", ")))
+            tupled_values = tuple(values.split(", "))
+            if len(tupled_values) == 1:
+                values = str(tupled_values)[:-2] + ")"
+            else:
+                values = str(tupled_values)
             cursor.execute("INSERT INTO %s(%s) VALUES %s" % (table,
                                                              column_names,
                                                              values))
@@ -376,7 +380,11 @@ class Connector(object):
                              self.__credentials_dict["host"],
                              self.__credentials_dict["password"]) as db:
             cursor = db.cursor()
-            values = str(tuple(values.split(", ")))
+            tupled_values = tuple(values.split(", "))
+            if len(tupled_values) == 1:
+                values = str(tupled_values)[:-2] + ")"
+            else:
+                values = str(tupled_values)
             cursor.execute('INSERT INTO "%s"(%s) VALUES %s' % (table,
                                                                column_names,
                                                                values))

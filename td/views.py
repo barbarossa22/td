@@ -82,14 +82,17 @@ def get_todo_list_items(request):
                  "/api/get_todo_list_items from user with ip %s",
                  ip)
     db = Connector("postgres")
-    user_id = db.select_one("id", "Users", "ip='%s'" % ip)[0]
+    user_id = db.select_one("id", "Users", "ip='%s'" % ip)
     if user_id is None:
         logger.debug("This user is not in the database and that's why "
                      "items for him don't exist, reply with "
                      "{'items': null} JSON.")
         return {"items": None}
+    else:
+        user_id = user_id[0]
 
-    client = pymongo.MongoClient(settings.mongo_host, int(settings.mongo_port))
+    client = pymongo.MongoClient(settings['mongo_host'],
+                                 int(settings['mongo_port']))
     db = client.TDDB
     items_collection = db.Items
     reply = items_collection.find({"owner_id": user_id},
@@ -131,7 +134,8 @@ def add_todo_list_item(request):
         db.insert("Users", "ip", ip)
         user_id = db.select_one("id", "Users", "ip='%s'" % ip)[0]
 
-    client = pymongo.MongoClient(settings.mongo_host, int(settings.mongo_port))
+    client = pymongo.MongoClient(settings['mongo_host'],
+                                 int(settings['mongo_port']))
     db = client.TDDB
     items_collection = db.Items
     items_collection.insert_one({"item": request.json_body["item"],
