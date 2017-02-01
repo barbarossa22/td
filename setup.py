@@ -5,25 +5,10 @@ from setuptools import setup, find_packages
 here = os.path.abspath(os.path.dirname(__file__))
 with open(os.path.join(here, 'README.txt')) as f:
     README = f.read()
-
-requires = [
-    'pyramid',
-    'pyramid_chameleon',
-    'pyramid_debugtoolbar',
-    'waitress',
-    'MySQL-python',
-    'pymongo==2.9.4',
-    'psycopg2',
-    'Sphinx'
-    ]
-
-tests_require = [
-    'WebTest >= 1.3.1',  # py3 compat
-    'pytest',  # includes virtualenv
-    'pytest-cov',
-    'nose',
-    'coverage'
-    ]
+with open(os.path.join(here, 'requirements.txt')) as requirements:
+    requires = [i.strip() for i in requirements.readlines()]
+with open(os.path.join(here, 'test_requirements.txt')) as test_requirements:
+    tests_require = [i.strip() for i in test_requirements.readlines()]
 
 setup(name='td',
       version='0.0',
@@ -42,10 +27,10 @@ setup(name='td',
       packages=find_packages(),
       include_package_data=True,
       zip_safe=False,
+      install_requires=requires,
       extras_require={
           'testing': tests_require,
       },
-      install_requires=requires,
       entry_points="""\
       [paste.app_factory]
       main = td:main
