@@ -3,8 +3,6 @@ import os
 from setuptools import setup, find_packages
 
 here = os.path.abspath(os.path.dirname(__file__))
-with open(os.path.join(here, 'README.txt')) as f:
-    README = f.read()
 with open(os.path.join(here, 'requirements.txt')) as requirements:
     requires = [i.strip() for i in requirements.readlines()]
 with open(os.path.join(here, 'test_requirements.txt')) as test_requirements:
@@ -13,7 +11,6 @@ with open(os.path.join(here, 'test_requirements.txt')) as test_requirements:
 setup(name='td',
       version='0.0',
       description='td',
-      long_description=README,
       classifiers=[
           "Programming Language :: Python",
           "Framework :: Pyramid",
