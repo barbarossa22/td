@@ -90,19 +90,19 @@ To check if everything was installed properly you can run interactive interprete
 
 ### Create users, databases and tables
 
-Run script from mysql:
+Run script from mysql (path to script given as example, you need to provide own path to it):
 
 `mysql -u root -p`
 
-`source /home/mrad/td/fixtures/create_mysql_db.sql;`
+`source /home/<user>/td/fixtures/create_mysql_db.sql;`
 
-Run script from postgres:
+Run script from postgres (path to script given as example, you need to provide own path to it):
 
 `sudo -i -u postgres`
 
 `psql`
 
-`\i /home/user/td/fixtures/create_postgres_db.sql`
+`\i /home/<user>/td/fixtures/create_postgres_db.sql`
 
 
 ## virtualenvwrapper
@@ -111,7 +111,7 @@ Get virtualenvwrapper from pypi:
 
 `sudo pip install virtualenvwrapper`
 
-Append this to your user's .bashrc file:
+Append this to your user's ~/.bashrc file:
 
 `source /usr/local/bin/virtualenvwrapper.sh`
 
@@ -149,6 +149,8 @@ To run app with development config execute next command:
 `pserve development.ini --reload`
 
 --reload option if used waits for any changes to any Python module and when they're detected causes the server to restart.
+
+Now app is accessible from the browser at address `http://localhost:6543` or whatever path/port you provide inside your configs.
 
 When you add new dependancies to the project updates can be installed through usage of next commands: `pip install -e .` or `python setup.py develop` or `pip install -r requirements.txt`. The last one is the fastest way.
 
