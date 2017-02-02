@@ -17,10 +17,32 @@ from pyramid.threadlocal import get_current_registry
 from td.exceptions import WrongEngineException
 
 
-class MySQLDbAssessor:
-    """Context-manager for MySQLdb connection to the database.
+class Assessor:
+    """Return the resource of db connection """
 
-    """
+    def __enter__(self):
+        """Serve as a parent for future implementations of it's descendants
+        with their own credentials and params. Enter method returns the
+        resource of db connection to be managed in a context.
+
+        :return: connection object.
+        :raises: NotImplementedError
+        """
+        try:
+            return self.db
+        except AttributeError:
+            error_message = ("You can only derive from Assesor class and then "
+                             "use it's descendant as a context-manager!")
+            raise NotImplementedError(error_message)
+
+    def __exit__(self, *args):
+        """Exit the context and perform cleanup closing db connection."""
+        self.db.close()
+
+
+
+class MySQLDbAssessor(Assessor):
+    """Context-manager for MySQLdb connection to the database."""
     def __init__(self, host, user, password, db_name):
         """Initialize context-manager call with credentials.
 
@@ -39,31 +61,14 @@ class MySQLDbAssessor:
         self.password = password
         self.db_name = db_name
 
-    def __enter__(self):
-        """Return the resource of db connection to be managed in a context.
-
-        Also assigns to created instance cursor object so it can be used later
-        like MySQLDbAssesor_instance.cursor.execute(<raw_sql>) or
-        MySQLDbAssessor_instance.cursor.fetchall().
-
-        :return: MySQLdb connection object.
-        """
         self.db = MySQLdb.connect(self.host,
                                   self.user,
                                   self.password,
                                   self.db_name)
-        self.db.cursor = self.db.cursor()
-        return self.db
-
-    def __exit__(self, *args):
-        """Exit the context and perform cleanup closing db connection."""
-        self.db.close()
 
 
-class PgresDbAssessor:
-    """Context-manager for psycopg2 connection to the database.
-
-    """
+class PgresDbAssessor(Assessor):
+    """Context-manager for psycopg2 connection to the database."""
     def __init__(self, dbname, user, host, password):
         """Initialize context-manager call with credentials.
 
@@ -82,20 +87,10 @@ class PgresDbAssessor:
         self.host = host
         self.password = password
 
-    def __enter__(self):
-        """Return the resource of db connection to be managed in a context.
-
-        :return: psycopg2 connection object.
-        """
         self.db = psycopg2.connect(dbname=self.dbname,
                                    user=self.user,
                                    host=self.host,
                                    password=self.password)
-        return self.db
-
-    def __exit__(self, *args):
-        """Exit the context and perform cleanup closing db connection."""
-        self.db.close()
 
 
 class Connector(object):
@@ -244,7 +239,7 @@ class Connector(object):
                              self.__credentials_dict["user"],
                              self.__credentials_dict["password"],
                              self.__credentials_dict["dbname"]) as db:
-            cursor = db.cursor
+            cursor = db.cursor()
             if where_clause is None:
                 cursor.execute("SELECT %s FROM %s" % (column_names, table))
             else:
@@ -347,7 +342,7 @@ class Connector(object):
                              self.__credentials_dict["user"],
                              self.__credentials_dict["password"],
                              self.__credentials_dict["dbname"]) as db:
-            cursor = db.cursor
+            cursor = db.cursor()
             tupled_values = tuple(values.split(", "))
             if len(tupled_values) == 1:
                 values = str(tupled_values)[:-2] + ")"
