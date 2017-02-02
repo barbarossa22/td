@@ -53,7 +53,7 @@ Get the Postgres package and a "contrib" package that adds some additional utili
 
 `sudo apt-get install postgresql postgresql-contrib`
 
-Install libpq-dev library which contains binaries for installation and proper work) in future of psycopg2 (postgres adapter for python).
+Install libpq-dev library which contains binaries for installation and proper work in future of psycopg2 (postgres adapter for python).
 
 `sudo apt-get install libpq-dev`
 
@@ -157,7 +157,7 @@ When you add new dependancies to the project updates can be installed through us
 ## Tests
 Install testing dependancies from setup.py 'tests_require' section:
 
-`pip install -e ".[testing]"`
+`pip install -e ".[testing]"` or `pip install -r test_requirements.txt`
 
 Use nosetests to autodiscover existing tests modules for the project and run them.
 
@@ -166,3 +166,11 @@ Use nosetests to autodiscover existing tests modules for the project and run the
 To get info about coverage:
 
 `nosetests --with-coverage`
+
+## Documentation
+
+You can use Sphinx to autogenerate html with code documentation. Make build from source files with (cd to project's root directory, if you're not there):
+
+`sphinx-build -b html source build`
+
+Now it's possible to read the docs opening them in `build/index.html` and then surfing in the browser through the pages.
