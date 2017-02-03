@@ -95,5 +95,5 @@ class TestTodoListPageGetting(unittest.TestCase):
         with known html code in it's body.
         """
         response = views.get_todo_list_page(self.request)
-        self.assertIn("<div id='add_item_panel' class='input-group'>",
+        self.assertIn('<div id="add_item_panel" class="input-group">',
                       response.body)
