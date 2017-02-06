@@ -40,7 +40,6 @@ class Assessor:
         self.db.close()
 
 
-
 class MySQLDbAssessor(Assessor):
     """Context-manager for MySQLdb connection to the database."""
     def __init__(self, host, user, password, db_name):
@@ -134,10 +133,10 @@ class Connector(object):
         settings = registry.settings
 
         try:
-            return {"dbname": settings["{}_db_name".format(engine_type)],
-                    "user": settings["{}_user".format(engine_type)],
-                    "host": settings["{}_host".format(engine_type)],
-                    "password": settings["{}_password".format(engine_type)]}
+            return {"dbname": settings["{}.db_name".format(engine_type)],
+                    "user": settings["{}.user".format(engine_type)],
+                    "host": settings["{}.host".format(engine_type)],
+                    "password": settings["{}.password".format(engine_type)]}
         except KeyError:
             raise WrongEngineException(self.ERROR_MESSAGE)
 
@@ -240,12 +239,15 @@ class Connector(object):
                              self.__credentials_dict["password"],
                              self.__credentials_dict["dbname"]) as db:
             cursor = db.cursor()
-            if where_clause is None:
-                cursor.execute("SELECT %s FROM %s" % (column_names, table))
-            else:
-                cursor.execute("SELECT %s FROM %s WHERE %s" % (column_names,
-                                                               table,
-                                                               where_clause))
+            args = (column_names, table)
+            query_template = "SELECT %s FROM %s"
+
+            if where_clause is not None:
+                args += (where_clause,)
+                query_template += " WHERE %s"
+
+            cursor.execute(query_template % args)
+
             if how_many == "all":
                 return cursor.fetchall()
             else:
@@ -285,12 +287,16 @@ class Connector(object):
                              self.__credentials_dict["host"],
                              self.__credentials_dict["password"]) as db:
             cursor = db.cursor()
-            if where_clause is None:
-                cursor.execute('SELECT %s FROM "%s"' % (column_names, table))
-            else:
-                cursor.execute('SELECT %s FROM "%s" WHERE %s' % (column_names,
-                                                                 table,
-                                                                 where_clause))
+
+            args = (column_names, table)
+            query_template = 'SELECT %s FROM "%s"'
+
+            if where_clause is not None:
+                args += (where_clause,)
+                query_template += ' WHERE %s'
+
+            cursor.execute(query_template % args)
+
             if how_many == "all":
                 return tuple(cursor.fetchall())
             else:
@@ -315,72 +321,25 @@ class Connector(object):
         """
 
         if self.engine_type == "mysql":
-            self.__exec_mysql_insertion(table, column_names, values)
+            assessor = MySQLDbAssessor
+            query_template = "INSERT INTO %s(%s) VALUES %s"
         elif self.engine_type == "postgres":
-            self.__exec_pgres_insertion(table, column_names, values)
+            assessor = PgresDbAssessor
+            query_template = 'INSERT INTO "%s"(%s) VALUES %s'
         else:
             raise WrongEngineException(self.ERROR_MESSAGE)
 
-    def __exec_mysql_insertion(self, table, column_names, values):
-        """Execute insert statement into mysql database.
-
-        It is expected to have args in the next format:
-        .insert("Users", "id, name", "1, Jonathan Swift")
-        .insert("Users", "name", "Jonathan Swift")
-
-        :param table: table name in the db for insert operation.
-        :type table: str.
-        :param column_names: column names in the table to affect.
-        :type column_names: str.
-        :param values: values to be inserted
-        :type values: str.
-        :return: None
-        :rtype: None
-        :raises: WrongEngineException
-        """
-        with MySQLDbAssessor(self.__credentials_dict["host"],
-                             self.__credentials_dict["user"],
-                             self.__credentials_dict["password"],
-                             self.__credentials_dict["dbname"]) as db:
+        with assessor(self.__credentials_dict["host"],
+                      self.__credentials_dict["user"],
+                      self.__credentials_dict["password"],
+                      self.__credentials_dict["dbname"]) as db:
             cursor = db.cursor()
             tupled_values = tuple(values.split(", "))
             if len(tupled_values) == 1:
                 values = str(tupled_values)[:-2] + ")"
             else:
                 values = str(tupled_values)
-            cursor.execute("INSERT INTO %s(%s) VALUES %s" % (table,
-                                                             column_names,
-                                                             values))
-            db.commit()
-
-    def __exec_pgres_insertion(self, table, column_names, values):
-        """Execute insert statement into postgres database.
-
-        It is expected to have args in the next format:
-        .insert("Users", "id, name", "1, Jonathan Swift")
-        .insert("Users", "name", "Jonathan Swift")
-
-        :param table: table name in the db for insert operation.
-        :type table: str.
-        :param column_names: column names in the table to affect.
-        :type column_names: str.
-        :param values: values to be inserted
-        :type values: str.
-        :return: None
-        :rtype: None
-        :raises: WrongEngineException
-        """
-        with PgresDbAssessor(self.__credentials_dict["dbname"],
-                             self.__credentials_dict["user"],
-                             self.__credentials_dict["host"],
-                             self.__credentials_dict["password"]) as db:
-            cursor = db.cursor()
-            tupled_values = tuple(values.split(", "))
-            if len(tupled_values) == 1:
-                values = str(tupled_values)[:-2] + ")"
-            else:
-                values = str(tupled_values)
-            cursor.execute('INSERT INTO "%s"(%s) VALUES %s' % (table,
-                                                               column_names,
-                                                               values))
+            cursor.execute(query_template % (table,
+                                             column_names,
+                                             values))
             db.commit()
