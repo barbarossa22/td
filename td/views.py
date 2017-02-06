@@ -51,7 +51,7 @@ def get_todo_list_page(request):
     return FileResponse(abs_path_to_base, cache_max_age=3600)
 
 
-def get_todo_list_items(request, **kwargs):
+def get_todo_list_items(request):
     """Get JSON with list of todo-items from Mongo database at request on
     /api/get_todo_list_items url.
 
@@ -82,10 +82,10 @@ def get_todo_list_items(request, **kwargs):
         return {"items": None}
     else:
         user_id = user_id[0]
-
-    client = pymongo.MongoClient(settings.mongo_creds['host'],
-                                 int(settings.mongo_creds['port']))
-    db = client.TDDB
+    mongo_creds = settings.mongo_creds
+    client = pymongo.MongoClient(mongo_creds['host'],
+                                 int(mongo_creds['port']))
+    db = client[mongo_creds['db_name']]
     items_collection = db.Items
     reply = items_collection.find({"owner_id": user_id},
                                   {"item": 1, "_id": 0})
@@ -126,9 +126,10 @@ def add_todo_list_item(request):
         user_id = db.select_one("id", "Users", "ip='%s'" % ip)[0]
     # Can't use .get here because of errror: TypeError:
     # 'builtin_function_or_method' object has no attribute '__getitem__'
-    client = pymongo.MongoClient(settings.mongo_creds['host'],
-                                 int(settings.mongo_creds['port']))
-    db = client.TDDB
+    mongo_creds = settings.mongo_creds
+    client = pymongo.MongoClient(mongo_creds['host'],
+                                 int(mongo_creds['port']))
+    db = client[mongo_creds['db_name']]
     items_collection = db.Items
     items_collection.insert_one({"item": request.json_body["item"],
                                  "owner_id": user_id})
