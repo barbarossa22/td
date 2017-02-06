@@ -15,7 +15,6 @@ import pymongo
 
 from pyramid.httpexceptions import HTTPFound
 from pyramid.response import FileResponse, Response
-from pyramid.view import view_config
 
 from td.assessors.assessors import Connector
 
@@ -23,7 +22,6 @@ from td.assessors.assessors import Connector
 logger = logging.getLogger(__name__)
 
 
-@view_config(route_name="home")
 def home(request):
     """Redirect from / to /todo_list url.
 
@@ -38,7 +36,6 @@ def home(request):
     return HTTPFound(location="/todo_list")
 
 
-@view_config(route_name="todo_list", request_method="GET")
 def get_todo_list_page(request):
     """Return static/base.html at request on /todo_list url.
 
@@ -56,9 +53,6 @@ def get_todo_list_page(request):
     return FileResponse(abs_path_to_base, cache_max_age=3600)
 
 
-@view_config(route_name="get_todo_list_items",
-             renderer="json",
-             request_method="GET")
 def get_todo_list_items(request):
     """Get JSON with list of todo-items from Mongo database at request on
     /api/get_todo_list_items url.
@@ -91,8 +85,8 @@ def get_todo_list_items(request):
     else:
         user_id = user_id[0]
 
-    client = pymongo.MongoClient(settings['mongo_host'],
-                                 int(settings['mongo_port']))
+    client = pymongo.MongoClient(settings['mongo.host'],
+                                 int(settings['mongo.port']))
     db = client.TDDB
     items_collection = db.Items
     reply = items_collection.find({"owner_id": user_id},
@@ -104,7 +98,6 @@ def get_todo_list_items(request):
     return {"items": items}
 
 
-@view_config(route_name="add_todo_list_item", request_method="POST")
 def add_todo_list_item(request):
     """ Add new item to the database.
 
@@ -134,8 +127,8 @@ def add_todo_list_item(request):
         db.insert("Users", "ip", ip)
         user_id = db.select_one("id", "Users", "ip='%s'" % ip)[0]
 
-    client = pymongo.MongoClient(settings['mongo_host'],
-                                 int(settings['mongo_port']))
+    client = pymongo.MongoClient(settings['mongo.host'],
+                                 int(settings['mongo.port']))
     db = client.TDDB
     items_collection = db.Items
     items_collection.insert_one({"item": request.json_body["item"],
