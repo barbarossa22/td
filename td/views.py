@@ -16,8 +16,6 @@ import pymongo
 from pyramid.httpexceptions import HTTPFound
 from pyramid.response import FileResponse, Response
 
-from td.assessors.assessors import Connector
-
 
 logger = logging.getLogger(__name__)
 
@@ -53,7 +51,7 @@ def get_todo_list_page(request):
     return FileResponse(abs_path_to_base, cache_max_age=3600)
 
 
-def get_todo_list_items(request):
+def get_todo_list_items(request, **kwargs):
     """Get JSON with list of todo-items from Mongo database at request on
     /api/get_todo_list_items url.
 
@@ -75,7 +73,7 @@ def get_todo_list_items(request):
     logger.debug("Get request for todo list items at "
                  "/api/get_todo_list_items from user with ip %s",
                  ip)
-    db = Connector("postgres")
+    db = settings.db
     user_id = db.select_one("id", "Users", "ip='%s'" % ip)
     if user_id is None:
         logger.debug("This user is not in the database and that's why "
@@ -85,8 +83,8 @@ def get_todo_list_items(request):
     else:
         user_id = user_id[0]
 
-    client = pymongo.MongoClient(settings['mongo.host'],
-                                 int(settings['mongo.port']))
+    client = pymongo.MongoClient(settings.mongo_creds['host'],
+                                 int(settings.mongo_creds['port']))
     db = client.TDDB
     items_collection = db.Items
     reply = items_collection.find({"owner_id": user_id},
@@ -119,16 +117,17 @@ def add_todo_list_item(request):
                  "request on /api/add_todo_list_items",
                  ip)
 
-    db = Connector("postgres")
+    db = settings.db
     user_id = db.select_one("id", "Users", "ip='%s'" % ip)
     if user_id is None:
         logger.debug("User with such ip does not exist in the database, "
                      "creating new entry for him in Users table")
         db.insert("Users", "ip", ip)
         user_id = db.select_one("id", "Users", "ip='%s'" % ip)[0]
-
-    client = pymongo.MongoClient(settings['mongo.host'],
-                                 int(settings['mongo.port']))
+    # Can't use .get here because of errror: TypeError:
+    # 'builtin_function_or_method' object has no attribute '__getitem__'
+    client = pymongo.MongoClient(settings.mongo_creds['host'],
+                                 int(settings.mongo_creds['port']))
     db = client.TDDB
     items_collection = db.Items
     items_collection.insert_one({"item": request.json_body["item"],

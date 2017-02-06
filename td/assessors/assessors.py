@@ -68,10 +68,10 @@ class MySQLDbAssessor(Assessor):
 
 class PgresDbAssessor(Assessor):
     """Context-manager for psycopg2 connection to the database."""
-    def __init__(self, dbname, user, host, password):
+    def __init__(self, db_name, user, host, password):
         """Initialize context-manager call with credentials.
 
-        :param dbname: database name to use.
+        :param db_name: database name to use.
         :type: str
         :param user: username for authentication to local Postgres db server.
         :type: str
@@ -81,64 +81,43 @@ class PgresDbAssessor(Assessor):
         :type: str
 
         """
-        self.dbname = dbname
+        self.db_name = db_name
         self.user = user
         self.host = host
         self.password = password
 
-        self.db = psycopg2.connect(dbname=self.dbname,
+        self.db = psycopg2.connect(dbname=self.db_name,
                                    user=self.user,
                                    host=self.host,
                                    password=self.password)
 
 
 class Connector(object):
-    """Connector to mysql or postgres databases with interface for select
-    queries.
+    """Connector to mysql or postgres databases with interface for select /
+    insert queries.
 
-    Initialize class passing to it engine_type string ('mysql' or 'postgres').
-    On initialization selected database credentials are retrieved from td app
-    registry settings which were parsed previously from the current working
-    config file. Two public methods available: select_one and select_all which
-    send select queries to the database server establishing connection with it
+    Initialize class passing to it engine_type string ('mysql' or 'postgres')
+    and it's credentials and params in the dict like {'host': 'localhost',
+    'user': 'root', 'password': 1234, 'db_name': 'db'}.
+
+    Three public methods available: select_one, select_all and insert which
+    send queries to the database server establishing connection with it
     using MySQLDbAssessor and PgresDbAssessor drivers as context managers for
     each single request.
     """
 
-    def __init__(self, engine_type):
-        """Initialize Connector with provided as arg database type. Get needed
-        databases credentials and params from app's registry settings.
+    def __init__(self, engine_type, creds_dict):
+        """Initialize Connector with provided as arg database type.
 
         :param engine_type: Type of engine ('mysql' or 'postgres').
         :type engine_type: str.
+        :param creds_dict: Dict with creds and params.
+        :type creds_dict: dict.
         """
         self.engine_type = engine_type
+        self.__credentials_dict = creds_dict
         self.ERROR_MESSAGE = ("Wrong argument describing engine type. Use "
                               "'mysql' or 'postgres'.")
-        self.__credentials_dict = self.__retrieve_creds_from_cfg(
-            self.engine_type
-        )
-
-    def __retrieve_creds_from_cfg(self, engine_type):
-        """
-        Get db credentials from 'database' section of .ini config file.
-
-        :param engine_type: Type of engine (mysql or postgres).
-        :type engine_type: str.
-        :return: dictionary with db credentials and settings.
-        :rtype: dict
-        :raises: WrongEngineException
-        """
-        registry = get_current_registry()
-        settings = registry.settings
-
-        try:
-            return {"dbname": settings["{}.db_name".format(engine_type)],
-                    "user": settings["{}.user".format(engine_type)],
-                    "host": settings["{}.host".format(engine_type)],
-                    "password": settings["{}.password".format(engine_type)]}
-        except KeyError:
-            raise WrongEngineException(self.ERROR_MESSAGE)
 
     def select_one(self, column_names, table, where_clause=None):
         """
@@ -237,7 +216,7 @@ class Connector(object):
         with MySQLDbAssessor(self.__credentials_dict["host"],
                              self.__credentials_dict["user"],
                              self.__credentials_dict["password"],
-                             self.__credentials_dict["dbname"]) as db:
+                             self.__credentials_dict["db_name"]) as db:
             cursor = db.cursor()
             args = (column_names, table)
             query_template = "SELECT %s FROM %s"
@@ -282,7 +261,7 @@ class Connector(object):
         :return: tuple with fetched data from selected query.
         :rtype: tuple
         """
-        with PgresDbAssessor(self.__credentials_dict["dbname"],
+        with PgresDbAssessor(self.__credentials_dict["db_name"],
                              self.__credentials_dict["user"],
                              self.__credentials_dict["host"],
                              self.__credentials_dict["password"]) as db:
@@ -332,7 +311,7 @@ class Connector(object):
         with assessor(self.__credentials_dict["host"],
                       self.__credentials_dict["user"],
                       self.__credentials_dict["password"],
-                      self.__credentials_dict["dbname"]) as db:
+                      self.__credentials_dict["db_name"]) as db:
             cursor = db.cursor()
             tupled_values = tuple(values.split(", "))
             if len(tupled_values) == 1:
