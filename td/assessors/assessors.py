@@ -308,10 +308,10 @@ class Connector(object):
         else:
             raise WrongEngineException(self.ERROR_MESSAGE)
 
-        with assessor(self.__credentials_dict["host"],
-                      self.__credentials_dict["user"],
-                      self.__credentials_dict["password"],
-                      self.__credentials_dict["db_name"]) as db:
+        with assessor(db_name=self.__credentials_dict["db_name"],
+                      user=self.__credentials_dict["user"],
+                      host=self.__credentials_dict["host"],
+                      password=self.__credentials_dict["password"]) as db:
             cursor = db.cursor()
             tupled_values = tuple(values.split(", "))
             if len(tupled_values) == 1:
