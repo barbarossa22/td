@@ -17,5 +17,7 @@ USE TDDB;
 
 CREATE TABLE Users (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    ip VARCHAR(15)
+    ip VARCHAR(15),
+    username VARCHAR(64) NOT NULL,
+    password VARCHAR(256) NOT NULL
 );
