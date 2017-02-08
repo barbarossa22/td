@@ -57,11 +57,15 @@ def main(global_config, **settings):
                     route_name='add_todo_list_item',
                     request_method="POST",
                     decorator=connect_db_to_view)
+    config.add_view('td.views.get_login_page',
+                    route_name='login',
+                    request_method='GET')
 
     config.add_route("home", "/")
     config.add_route("todo_list", "/todo_list")
     config.add_route("get_todo_list_items", "/api/get_todo_list_items")
     config.add_route("add_todo_list_item", "/api/add_todo_list_item")
+    config.add_route("login", "/login")
 
     my_session_factory = SignedCookieSessionFactory("super_secret")
     config.set_session_factory(my_session_factory)

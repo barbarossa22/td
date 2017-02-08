@@ -123,6 +123,7 @@ def add_todo_list_item(request):
         logger.debug("User with such ip does not exist in the database, "
                      "creating new entry for him in Users table")
         db.insert("Users", "ip", ip)
+        logger.debug('here')
         user_id = db.select_one("id", "Users", "ip='%s'" % ip)[0]
     # Can't use .get here because of errror: TypeError:
     # 'builtin_function_or_method' object has no attribute '__getitem__'
@@ -138,3 +139,16 @@ def add_todo_list_item(request):
                  request.json_body["item"])
 
     return Response("OK")
+
+def get_login_page(request):
+    """Return static/login.html at request on /login url.
+
+    :param request:
+    :return:
+    """
+    logger.debug("Get request for resource at /login and replied with "
+                 "file static/login.html")
+    abs_path_to_base = "".join([os.path.dirname(__file__),
+                                os.sep,
+                                os.path.join("static", "login.html")])
+    return FileResponse(abs_path_to_base, cache_max_age=3600)
