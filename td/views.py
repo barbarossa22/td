@@ -192,7 +192,7 @@ def post_login_credentials(request):
         if password_master.check_password(password, hashed_pword_from_db):
             headers = remember(request, login)
             logger.debug(headers)
-            logger.debug('kinda user %s has logged in right now', login)
+            logger.debug('User %s has logged in right now.', login)
             return HTTPFound('/todo_list', headers=headers)
         else:
             logger.debug('Wrong password.')

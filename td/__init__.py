@@ -8,7 +8,6 @@ from pyramid.authentication import AuthTktAuthenticationPolicy
 from pyramid.authorization import ACLAuthorizationPolicy
 from pyramid.config import Configurator
 from pyramid.security import Allow, Everyone
-#from pyramid.session import SignedCookieSessionFactory
 
 from td.assessors.assessors import Connector
 from td.config import ConfigScanner
@@ -65,7 +64,6 @@ def main(global_config, **settings):
             logger.debug(groups_list)
             return groups_list
         return []
-        # return [g.groupname for g in user.groups]
 
     authn_policy = AuthTktAuthenticationPolicy(settings['auth.secret'],
                                                callback=groupfinder)
@@ -73,8 +71,6 @@ def main(global_config, **settings):
     authz_policy = ACLAuthorizationPolicy()
     config.set_authentication_policy(authn_policy)
     config.set_authorization_policy(authz_policy)
-    #my_session_factory = SignedCookieSessionFactory("super_secret")
-    #config.set_session_factory(my_session_factory)
 
     config.add_static_view("static",
                            path="td:static",
