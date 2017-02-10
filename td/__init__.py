@@ -7,10 +7,24 @@
 from pyramid.authentication import AuthTktAuthenticationPolicy
 from pyramid.authorization import ACLAuthorizationPolicy
 from pyramid.config import Configurator
-from pyramid.session import SignedCookieSessionFactory
+from pyramid.security import Allow, Everyone
+#from pyramid.session import SignedCookieSessionFactory
 
-from td.config import ConfigScanner
 from td.assessors.assessors import Connector
+from td.config import ConfigScanner
+
+import logging
+
+logger = logging.getLogger(__name__)
+
+
+class RootFactory(object):
+    __acl__ = [(Allow, Everyone, 'everybody'),
+               (Allow, 'basic', 'entry'),
+               (Allow, 'secured', 'topsecret')]
+
+    def __init__(self, request):
+        pass
 
 
 def main(global_config, **settings):
@@ -41,14 +55,26 @@ def main(global_config, **settings):
             return response
         return wrapper
 
-    config = Configurator(settings=settings)
+    config = Configurator(settings=settings, root_factory=RootFactory)
 
-    authn_policy = AuthTktAuthenticationPolicy(settings['auth.secret'])
+    def groupfinder(userid, request):
+        query_output = db.select_one("groups", "Users",
+                                     "username='%s'" % userid)
+        if query_output is not None:
+            groups_list = query_output[0].split(', ')
+            logger.debug(groups_list)
+            return groups_list
+        return []
+        # return [g.groupname for g in user.groups]
+
+    authn_policy = AuthTktAuthenticationPolicy(settings['auth.secret'],
+                                               callback=groupfinder)
+
     authz_policy = ACLAuthorizationPolicy()
     config.set_authentication_policy(authn_policy)
     config.set_authorization_policy(authz_policy)
-    my_session_factory = SignedCookieSessionFactory("super_secret")
-    config.set_session_factory(my_session_factory)
+    #my_session_factory = SignedCookieSessionFactory("super_secret")
+    #config.set_session_factory(my_session_factory)
 
     config.add_static_view("static",
                            path="td:static",
@@ -56,7 +82,8 @@ def main(global_config, **settings):
     config.add_view('td.views.home', route_name='home')
     config.add_view('td.views.get_todo_list_page',
                     route_name='todo_list',
-                    request_method="GET")
+                    request_method="GET",
+                    permission='topsecret')
     config.add_view('td.views.get_todo_list_items',
                     route_name='get_todo_list_items',
                     renderer="json",
@@ -86,6 +113,5 @@ def main(global_config, **settings):
     config.add_route("login", "/login")
     config.add_route("post_login_credentials", "/api/post_login_credentials")
     config.add_route("logout", "/logout")
-
     config.scan()
     return config.make_wsgi_app()
