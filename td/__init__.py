@@ -4,6 +4,8 @@
 
 """
 
+from pyramid.authentication import AuthTktAuthenticationPolicy
+from pyramid.authorization import ACLAuthorizationPolicy
 from pyramid.config import Configurator
 from pyramid.session import SignedCookieSessionFactory
 
@@ -33,13 +35,20 @@ def main(global_config, **settings):
         :param view_to_wrap: View func to extend.
         :return: Wrapped view func with injected db instance in it's request.
         """
-        def wrapper(context, request, **kwargs):
+        def wrapper(context, request):
             request.registry.settings['db'] = db
             response = view_to_wrap(context, request)
             return response
         return wrapper
 
     config = Configurator(settings=settings)
+
+    authn_policy = AuthTktAuthenticationPolicy(settings['auth.secret'])
+    authz_policy = ACLAuthorizationPolicy()
+    config.set_authentication_policy(authn_policy)
+    config.set_authorization_policy(authz_policy)
+    my_session_factory = SignedCookieSessionFactory("super_secret")
+    config.set_session_factory(my_session_factory)
 
     config.add_static_view("static",
                            path="td:static",
@@ -51,24 +60,32 @@ def main(global_config, **settings):
     config.add_view('td.views.get_todo_list_items',
                     route_name='get_todo_list_items',
                     renderer="json",
+                    xhr=True,
                     request_method="GET",
                     decorator=connect_db_to_view)
     config.add_view('td.views.add_todo_list_item',
                     route_name='add_todo_list_item',
+                    xhr=True,
                     request_method="POST",
                     decorator=connect_db_to_view)
     config.add_view('td.views.get_login_page',
                     route_name='login',
                     request_method='GET')
+    config.add_view('td.views.post_login_credentials',
+                    route_name='post_login_credentials',
+                    xhr=True,
+                    request_method='POST',
+                    decorator=connect_db_to_view)
+    config.add_view('td.views.logout',
+                    route_name='logout')
 
     config.add_route("home", "/")
     config.add_route("todo_list", "/todo_list")
     config.add_route("get_todo_list_items", "/api/get_todo_list_items")
     config.add_route("add_todo_list_item", "/api/add_todo_list_item")
     config.add_route("login", "/login")
-
-    my_session_factory = SignedCookieSessionFactory("super_secret")
-    config.set_session_factory(my_session_factory)
+    config.add_route("post_login_credentials", "/api/post_login_credentials")
+    config.add_route("logout", "/logout")
 
     config.scan()
     return config.make_wsgi_app()
