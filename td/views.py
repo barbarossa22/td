@@ -29,6 +29,7 @@ def forbidden_view(request):
     if not authenticated_userid(request):
         return HTTPFound(location='/login')
 
+
 def home(request):
     """Redirect from / to /todo_list url.
 
@@ -173,8 +174,8 @@ def post_login_credentials(request):
 
     :param request: instance-object which represents HTTP request.
     :type: pyramid.request.Request
-    :returns: Response instance with 'OK' str body to indicate a success.
-    :rtype: pyramid.response.Response
+    :returns:
+    :rtype:
 
     """
     login = request.json_body["login"]
@@ -191,18 +192,23 @@ def post_login_credentials(request):
         if password_master.check_password(password, hashed_pword_from_db):
             headers = remember(request, login)
             logger.debug(headers)
-            return HTTPFound(location='/todo_list', headers=headers)
+            logger.debug('kinda user %s has logged in right now', login)
+            return HTTPFound('/todo_list', headers=headers)
         else:
             logger.debug('Wrong password.')
             return HTTPForbidden()
     logger.debug('No such username in db.')
     return HTTPForbidden()
 
+
 def logout(request):
     """Logout user.
 
-    :param request:
-    :return:
+    :param request: instance-object which represents HTTP request.
+    :type: pyramid.request.Request
+    :returns: HTTPFound exception as response object with status code 302.
+    :raises: pyramid.httpexceptions.HTTPFound
     """
     headers = forget(request)
+    logger.debug('User %s logged out.', authenticated_userid(request))
     return HTTPFound(location='/login', headers=headers)
