@@ -47,7 +47,17 @@ function post_new_item() {
     });
 }
 
+function draw_logout_btn() {
+    // if login in sessionStorage prepend logout button to #main:
+    username = sessionStorage.getItem('username');
+    if (username) {
+        template = `<p class="text-right">Logged in as <em>${username}</em>. <a href="/logout" onclick="sessionStorage.removeItem('username');"><span class="fa fa-sign-out"></span>Logout</a></p>`
+        $("#main").prepend(template);
+    }
+}
+
 $(document).ready(function() {
+        draw_logout_btn();
         get_items();
     }
 );

@@ -11,12 +11,13 @@
 
     <div id="main">
         <span>Login:</span>
-        <input id="add_item_input" type="text" class="form-control"/>
+        <input id="login_input" type="text" class="form-control"/>
         <span>Password:</span>
-        <input id="add_item_input" type="password" class="form-control"/>
-        <input type="submit"/>
+        <input id="password_input" type="password" class="form-control has-error has-feedback"/>
+        <input id="login_btn" type="button" value="Log me in" class="btn btn-success" onclick="post_login_credentials();"/>
     </div>
     <script src="//oss.maxcdn.com/libs/jquery/1.10.2/jquery.min.js"></script>
+    <script src="static/login_script.js"></script>
 </body>
 
 </html>

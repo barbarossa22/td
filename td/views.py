@@ -13,12 +13,21 @@ import logging
 import os
 import pymongo
 
-from pyramid.httpexceptions import HTTPFound
+from pyramid.httpexceptions import HTTPFound, HTTPForbidden
 from pyramid.response import FileResponse, Response
+from pyramid.security import remember, forget, authenticated_userid
+from pyramid.view import forbidden_view_config
+
+from td.password_master import PasswordMaster
 
 
 logger = logging.getLogger(__name__)
 
+
+@forbidden_view_config()
+def forbidden_view(request):
+    if not authenticated_userid(request):
+        return HTTPFound(location='/login')
 
 def home(request):
     """Redirect from / to /todo_list url.
@@ -45,6 +54,7 @@ def get_todo_list_page(request):
     """
     logger.debug("Get request for resource at /todo_list and replied with "
                  "file static/base.html")
+    logger.debug("authenticated_userid: %s", authenticated_userid(request))
     abs_path_to_base = "".join([os.path.dirname(__file__),
                                 os.sep,
                                 os.path.join("static", "base.html")])
@@ -140,15 +150,59 @@ def add_todo_list_item(request):
 
     return Response("OK")
 
+
 def get_login_page(request):
     """Return static/login.html at request on /login url.
 
-    :param request:
-    :return:
+    :param request: instance-object which represents HTTP request.
+    :type: pyramid.request.Request
+    :returns: object that is used to serve a file from static/login.html.
+    :rtype: pyramid.response.FileResponse
     """
     logger.debug("Get request for resource at /login and replied with "
                  "file static/login.html")
+    logger.debug("authenticated_userid: %s", authenticated_userid(request))
     abs_path_to_base = "".join([os.path.dirname(__file__),
                                 os.sep,
                                 os.path.join("static", "login.html")])
     return FileResponse(abs_path_to_base, cache_max_age=3600)
+
+
+def post_login_credentials(request):
+    """Accept POST request with login and password from the client.
+
+    :param request: instance-object which represents HTTP request.
+    :type: pyramid.request.Request
+    :returns: Response instance with 'OK' str body to indicate a success.
+    :rtype: pyramid.response.Response
+
+    """
+    login = request.json_body["login"]
+    password = request.json_body["password"]
+    ip = request.client_addr
+    logger.debug("login: %s, password: %s, ip: %s", login, password, ip)
+
+    password_master = PasswordMaster()
+    db = request.registry.settings.db
+    query_output = db.select_one("password", "Users", "username='%s'" % login)
+
+    if query_output is not None:
+        hashed_pword_from_db = query_output[0]
+        if password_master.check_password(password, hashed_pword_from_db):
+            headers = remember(request, login)
+            logger.debug(headers)
+            return HTTPFound(location='/todo_list', headers=headers)
+        else:
+            logger.debug('Wrong password.')
+            return HTTPForbidden()
+    logger.debug('No such username in db.')
+    return HTTPForbidden()
+
+def logout(request):
+    """Logout user.
+
+    :param request:
+    :return:
+    """
+    headers = forget(request)
+    return HTTPFound(location='/login', headers=headers)
