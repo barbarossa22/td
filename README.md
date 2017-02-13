@@ -131,11 +131,39 @@ Use `deactivate` to exit current virtual environ, `lsvirtualenv` and `rmvirtuale
 
 ## Pyramid app setup and start
 
+#####Install Python dependancies
+
 If you're not in the project's dir cd to it and then invoke command, which installs the project in development mode (-e is for "editable") into the current directory (.):
 
 `pip install -e .`
 
 It is just pip wrapping on `python setup.py develop`, so you can use it too.
+
+When you add new dependancies to the project the updates can be installed through usage of next commands: `pip install -e .` or `python setup.py develop` or `pip install -r requirements.txt`. The last one is the fastest way.
+
+#####Create user to login the app.
+
+Postgres db:
+
+`sudo -i -u postgres`
+
+`psql`
+
+`\c TDDB;`
+
+`insert into "Users" (id, ip, username, password, groups) values (1, '127.0.0.1', 'user', '$2b$12$/zC.07EVRZc3Qiyymhzcz.bWaJFKde0nepVpx6cZZowz0WQZ7Wp.W', 'group:users');`
+
+or Mysql db:
+
+`mysql -u root -p`
+
+`use TDDB;`
+
+`insert into Users (id, ip, username, password, groups) values (1, '127.0.0.1', 'user', '$2b$12$/zC.07EVRZc3Qiyymhzcz.bWaJFKde0nepVpx6cZZowz0WQZ7Wp.W', 'group:users');`
+
+Your username is `user` and password is `1234`.
+
+#####Run
 
 Run the application with needed configuration file:
 
@@ -148,16 +176,15 @@ To run app with development config execute next command:
 
 `pserve development.ini --reload`
 
---reload option if used waits for any changes to any Python module and when they're detected causes the server to restart.
+`--reload` option if used waits for any changes to any Python module and when they're detected causes the server to restart.
 
 Now app is accessible from the browser at address `http://localhost:6543` or whatever path/port you provide inside your configs.
 
-When you add new dependancies to the project updates can be installed through usage of next commands: `pip install -e .` or `python setup.py develop` or `pip install -r requirements.txt`. The last one is the fastest way.
 
 ## Tests
 Install testing dependancies from setup.py 'tests_require' section:
 
-`pip install -e ".[testing]"` or `pip install -r test_requirements.txt`
+`pip install -e ".[testing]"` or you can do it directly from the file with command `pip install -r test_requirements.txt`
 
 Use nosetests to autodiscover existing tests modules for the project and run them.
 
