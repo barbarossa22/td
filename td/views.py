@@ -89,7 +89,7 @@ def get_todo_list_items(request):
         return {"items": None}
     else:
         user_id = user_id[0]
-    mongo_creds = settings.mongo_creds
+    mongo_creds = settings["mongo_creds"]
     client = pymongo.MongoClient(mongo_creds["host"],
                                  int(mongo_creds["port"]))
     db = client[mongo_creds["db_name"]]
@@ -126,7 +126,7 @@ def add_todo_list_item(request):
     user_id = db.select_one("id", "Users", "ip='%s'" % ip)
     if user_id is None:
         return HTTPUnauthorized()
-    mongo_creds = settings.mongo_creds
+    mongo_creds = settings["mongo_creds"]
     client = pymongo.MongoClient(mongo_creds['host'],
                                  int(mongo_creds['port']))
     db = client[mongo_creds['db_name']]
