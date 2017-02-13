@@ -13,7 +13,7 @@ import logging
 import os
 import pymongo
 
-from pyramid.httpexceptions import HTTPFound, HTTPForbidden
+from pyramid.httpexceptions import HTTPFound, HTTPForbidden, HTTPUnauthorized
 from pyramid.response import FileResponse, Response
 from pyramid.security import remember, forget, authenticated_userid
 
@@ -108,9 +108,7 @@ def add_todo_list_item(request):
 
     When request with POST method at /api/add_todo_list_item arrives then
     function checks if user's ip exists in the Postgres database table 'Users'.
-    If no then it creates new entry for him in 'Users' Postgres table and after
-    that appends to the 'Items' collection his todo list item from POST json
-    body in Mongo database.
+    If no then raises HTTPUnauthorized.
 
     :param request: instance-object which represents HTTP request.
     :type request: pyramid.request.Request
@@ -127,12 +125,7 @@ def add_todo_list_item(request):
     db = settings.db
     user_id = db.select_one("id", "Users", "ip='%s'" % ip)
     if user_id is None:
-        logger.debug("User with such ip does not exist in the database, "
-                     "creating new entry for him in Users table")
-        db.insert("Users", "ip", ip)
-        user_id = db.select_one("id", "Users", "ip='%s'" % ip)[0]
-    # Can't use .get here because of errror: TypeError:
-    # 'builtin_function_or_method' object has no attribute '__getitem__'
+        return HTTPUnauthorized()
     mongo_creds = settings.mongo_creds
     client = pymongo.MongoClient(mongo_creds['host'],
                                  int(mongo_creds['port']))
@@ -168,7 +161,7 @@ def post_login_credentials(request):
 
     :param request: instance-object which represents HTTP request.
     :type request: pyramid.request.Request
-    :returns: if ok HTTPFound with auth. headers in response else HTTPForbidden
+    :returns: if ok HTTPFound with auth. headers in response else HTTPUnauthorized
     """
     login = request.json_body["login"]
     password = request.json_body["password"]
@@ -185,9 +178,9 @@ def post_login_credentials(request):
             return HTTPFound("/todo_list", headers=headers)
         else:
             logger.debug("Wrong password.")
-            return HTTPForbidden()
+            return HTTPUnauthorized()
     logger.debug("No such username in db.")
-    return HTTPForbidden()
+    return HTTPUnauthorized()
 
 
 def logout(request):
