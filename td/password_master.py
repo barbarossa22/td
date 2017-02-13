@@ -17,9 +17,9 @@ class PasswordMaster(object):
         """ Hash password.
 
         :param password: password to hash
-        :type password: str.
+        :type password: str
         :return: hashed password in string
-        :rtype: str.
+        :rtype: str
         """
         salt = bcrypt.gensalt()
         hashed_password = bcrypt.hashpw(password.encode("utf8"), salt)
@@ -29,11 +29,11 @@ class PasswordMaster(object):
         """Check if args are equal and return True if yes, False if no.
 
         :param password: password to compare.
-        :type password: str.
+        :type password: str
         :param hashed_password: hashed pword value to compare.
-        :type hashed_password: str.
+        :type hashed_password: str
         :return: True or False on passwords comparison.
-        :rtype: bool.
+        :rtype: bool
         """
         result = bcrypt.checkpw(password.encode("utf8"), hashed_password)
         return result
