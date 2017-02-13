@@ -12,8 +12,6 @@
 import MySQLdb
 import psycopg2
 
-from pyramid.threadlocal import get_current_registry
-
 from td.exceptions import WrongEngineException
 
 

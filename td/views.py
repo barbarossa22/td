@@ -16,7 +16,6 @@ import pymongo
 from pyramid.httpexceptions import HTTPFound, HTTPForbidden
 from pyramid.response import FileResponse, Response
 from pyramid.security import remember, forget, authenticated_userid
-from pyramid.view import forbidden_view_config
 
 from td.password_master import PasswordMaster
 
@@ -24,7 +23,6 @@ from td.password_master import PasswordMaster
 logger = logging.getLogger(__name__)
 
 
-@forbidden_view_config()
 def forbidden_view(request):
     if not authenticated_userid(request):
         return HTTPFound(location='/login')

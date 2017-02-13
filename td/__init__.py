@@ -4,6 +4,8 @@
 
 """
 
+import logging
+
 from pyramid.authentication import AuthTktAuthenticationPolicy
 from pyramid.authorization import ACLAuthorizationPolicy
 from pyramid.config import Configurator
@@ -12,18 +14,18 @@ from pyramid.security import Allow, Everyone
 from td.assessors.assessors import Connector
 from td.config import ConfigScanner
 
-import logging
-
 logger = logging.getLogger(__name__)
 
 
 class RootFactory(object):
-    __acl__ = [(Allow, Everyone, 'everybody'),
-               (Allow, 'basic', 'entry'),
-               (Allow, 'secured', 'topsecret')]
-
+    """List of mappings from principal to permission."""
     def __init__(self, request):
         pass
+
+    def __acl__(self):
+        """Return list of mappings from principal to permission."""
+        return [(Allow, Everyone, 'everybody'),
+                (Allow, 'group:users', 'entry')]
 
 
 def main(global_config, **settings):
@@ -54,43 +56,57 @@ def main(global_config, **settings):
             return response
         return wrapper
 
-    config = Configurator(settings=settings, root_factory=RootFactory)
+    def group_finder(userid, request):
+        """Find all groups of user in the database and return list of them.
 
-    def groupfinder(userid, request):
+        :param userid: user's login name.
+        :type: str.
+        :param request: instance-object which represents HTTP request.
+        :type: pyramid.request.Request
+        :returns: list of groups (empty if no groups at all).
+        :rtype: list.
+        """
         query_output = db.select_one("groups", "Users",
                                      "username='%s'" % userid)
         if query_output is not None:
             groups_list = query_output[0].split(', ')
-            logger.debug(groups_list)
+            logger.debug('Authenticated user in this request is in groups: %s',
+                         groups_list)
             return groups_list
         return []
 
     authn_policy = AuthTktAuthenticationPolicy(settings['auth.secret'],
-                                               callback=groupfinder)
+                                               callback=group_finder)
 
     authz_policy = ACLAuthorizationPolicy()
+
+    config = Configurator(settings=settings, root_factory=RootFactory)
     config.set_authentication_policy(authn_policy)
     config.set_authorization_policy(authz_policy)
 
     config.add_static_view("static",
                            path="td:static",
                            cache_max_age=3600)
-    config.add_view('td.views.home', route_name='home')
+    config.add_forbidden_view('td.views.forbidden_view')
+
+    config.add_view('td.views.home', route_name='home', permission='entry')
     config.add_view('td.views.get_todo_list_page',
                     route_name='todo_list',
                     request_method="GET",
-                    permission='topsecret')
+                    permission='entry')
     config.add_view('td.views.get_todo_list_items',
                     route_name='get_todo_list_items',
                     renderer="json",
                     xhr=True,
                     request_method="GET",
-                    decorator=connect_db_to_view)
+                    decorator=connect_db_to_view,
+                    permission='entry')
     config.add_view('td.views.add_todo_list_item',
                     route_name='add_todo_list_item',
                     xhr=True,
                     request_method="POST",
-                    decorator=connect_db_to_view)
+                    decorator=connect_db_to_view,
+                    permission='entry')
     config.add_view('td.views.get_login_page',
                     route_name='login',
                     request_method='GET')
@@ -109,5 +125,5 @@ def main(global_config, **settings):
     config.add_route("login", "/login")
     config.add_route("post_login_credentials", "/api/post_login_credentials")
     config.add_route("logout", "/logout")
-    config.scan()
+
     return config.make_wsgi_app()

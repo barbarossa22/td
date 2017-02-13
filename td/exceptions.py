@@ -8,6 +8,7 @@
 
 """
 
+
 class WrongEngineException(Exception):
     """Class for exceptions which should trigger when wrong engine type is
     provided as argument to function call.
