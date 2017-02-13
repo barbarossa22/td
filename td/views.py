@@ -80,7 +80,7 @@ def get_todo_list_items(request):
     logger.debug("Get request for todo list items at "
                  "/api/get_todo_list_items from user with ip %s",
                  ip)
-    db = settings.db
+    db = settings["db"]
     user_id = db.select_one("id", "Users", "ip='%s'" % ip)
     if user_id is None:
         logger.debug("This user is not in the database and that's why "
@@ -122,7 +122,7 @@ def add_todo_list_item(request):
                  "request on /api/add_todo_list_items",
                  ip)
 
-    db = settings.db
+    db = settings["db"]
     user_id = db.select_one("id", "Users", "ip='%s'" % ip)
     if user_id is None:
         return HTTPUnauthorized()
@@ -167,7 +167,8 @@ def post_login_credentials(request):
     password = request.json_body["password"]
     ip = request.client_addr
     password_master = PasswordMaster()
-    db = request.registry.settings.db
+
+    db = request.registry.settings["db"]
     query_output = db.select_one("password", "Users", "username='%s'" % login)
 
     if query_output is not None:
