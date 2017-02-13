@@ -101,8 +101,8 @@ _ "Create users, databases and tables";
 #mysql -u root -p;
 #source /home/<user>/td/fixtures/create_mysql_db.sql;
 _ "Create user, db and table in mysql.";
-_ "mysql -u root -p TDDB < ~/td/fixtures/create_mysql_db.sql;"
-mysql -u root -p TDDB < ~/td/fixtures/create_mysql_db.sql;
+_ "mysql -u root -p < ~/td/fixtures/create_mysql_db.sql;"
+mysql -u root -p < ~/td/fixtures/create_mysql_db.sql;
 
 
 #Run script from postgres (path to script given as example, you need to provide
@@ -111,8 +111,8 @@ mysql -u root -p TDDB < ~/td/fixtures/create_mysql_db.sql;
 #psql;
 #\i /home/<user>/td/fixtures/create_postgres_db.sql
 _ "Create user, db and table in postgres.";
-_ "sudo -u postgres psql TDDB < ~/td/fixtures/create_postgres_db.sql;"
-sudo -u postgres psql TDDB < ~/td/fixtures/create_postgres_db.sql;
+_ "sudo -u postgres psql < ~/td/fixtures/create_postgres_db.sql;"
+sudo -u postgres psql < ~/td/fixtures/create_postgres_db.sql;
 
 ###
 _ "virtualenvwrapper";
@@ -149,9 +149,7 @@ _ "Install Python dependancies";
 #If you're not in the project's dir cd to it and then invoke command, which
 # installs the project in development mode (-e is for "editable") into the
 # current directory (.):
-_ "cd td;";
 _ "pip install -e .;";
-cd td;
 pip install -e .;
 #It is just pip wrapping on python setup.py develop, so you can use it too.
 
