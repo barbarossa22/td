@@ -4,7 +4,7 @@ _() { printf "\033[1;31m$1\033[0m \n"; }
 
 
 ###
-_ "Initial setup on clean Ubuntu 14";
+_ "*** Initial setup on clean Ubuntu 14 ***";
 ##
 #
 
@@ -28,12 +28,12 @@ _ "sudo apt-get install libffi-dev";
 sudo apt-get install libffi-dev
 
 ###
-_ "Setup databases";
+_ "*** Setup databases*** ";
 ##
 #
 
 ##
-_ "MySQL";
+_ "** MySQL **";
 #
 
 _ "Install mysql-server package (on root password creation prompt, please,";
@@ -58,7 +58,7 @@ _ "sudo apt-get install -y libmysqlclient-dev;"
 sudo apt-get install -y libmysqlclient-dev;
 
 ##
-_ "Postgresql";
+_ "** Postgresql **";
 #
 
 _ "Get the Postgres package and a "contrib" package that adds some additional";
@@ -75,7 +75,7 @@ sudo apt-get install -y libpq-dev;
 #psql
 
 ##
-_ "Mongodb";
+_ "** Mongodb **";
 #
 
 _ "Import the public key used by the package management system:";
@@ -98,7 +98,7 @@ sudo service mongod start;
 
 
 ##
-_ "Create users, databases and tables";
+_ "** Create users, databases and tables **";
 #
 
 #Run script from mysql (path to script given as example, you need to provide
@@ -120,7 +120,7 @@ _ "sudo -u postgres psql < ~/td/fixtures/create_postgres_db.sql;"
 sudo -u postgres psql < ~/td/fixtures/create_postgres_db.sql;
 
 ###
-_ "virtualenvwrapper";
+_ "*** virtualenvwrapper ***";
 #
 
 _ "Get virtualenvwrapper from pypi:";
@@ -144,11 +144,11 @@ _ "rmvirtualenv <name> to list all existing and remove single one by the name.";
 
 
 ###
-_ "Pyramid app setup and start";
+_ "*** Pyramid app setup and start ***";
 #
 
 ##
-_ "Install Python dependancies";
+_ "** Install Python dependancies **";
 #
 
 #If you're not in the project's dir cd to it and then invoke command, which
@@ -162,8 +162,15 @@ pip install -e .;
 # through usage of next commands: pip install -e . or python setup.py develop
 # or pip install -r requirements.txt. The last one is the fastest way.
 
+## Tests
+
+_ "Install testing dependancies from setup.py 'tests_require' section:";
+_ "pip install -e \".[testing]\";"
+pip install -e ".[testing]";
+#or you can do it directly from the file with command pip install -r test_requirements.txt
+
 ##
-_ "Create user to login the app.";
+_ "** Create user to login the app. **";
 #
 
 ## Postgres db:
@@ -203,10 +210,3 @@ _ "Your username is user and password is 1234.";
 # they're detected causes the server to restart.
 #Now app is accessible from the browser at address http://localhost:6543 or
 # whatever path/port you provide inside your configs.
-
-## Tests
-
-_ "Install testing dependancies from setup.py 'tests_require' section:";
-_ "pip install -e \".[testing]\";"
-pip install -e ".[testing]";
-#or you can do it directly from the file with command pip install -r test_requirements.txt
