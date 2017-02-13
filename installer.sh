@@ -9,13 +9,17 @@ _ "Initial setup on clean Ubuntu 14";
 #
 
 _ "Reload the local package database:";
+_ "sudo apt-get update;"
 sudo apt-get update;
 _ "On clean ubuntu systems there is no in-built git so install it:";
+_ "sudo apt-get install -y git;"
 sudo apt-get install -y git;
 _ "Install package which includes additional header files, a static library";
 _ "and development tools for building Python modules:";
+_ "sudo apt-get install -y python-dev;"
 sudo apt-get install -y python-dev;
 _ "Get pip:";
+_ "sudo apt-get install -y python-pip;"
 sudo apt-get install -y python-pip;
 
 ###
@@ -29,11 +33,14 @@ _ "MySQL";
 
 _ "Install mysql-server package (on root password creation prompt, please,";
 _ "provide password easy to recall later):";
+_ "sudo apt-get install -y mysql-server;"
 sudo apt-get install -y mysql-server;
 _ "Execute the included security script which changes some of the less secure";
 _ "default options (you need to answer on all prompts):";
+_ "sudo mysql_secure_installation;"
 sudo mysql_secure_installation;
 _ "Initialize the data directory:";
+_ "sudo mysql_install_db;";
 sudo mysql_install_db;
 
 #To check if everything was installed properly you can run interactive"
@@ -42,6 +49,7 @@ sudo mysql_install_db;
 _ "In order to make future installations of python's MySQLdb less painful and";
 _ "easy you need to install libmysqlclient-dev package which includes mysql";
 _ "database development files.";
+_ "sudo apt-get install -y libmysqlclient-dev;"
 sudo apt-get install -y libmysqlclient-dev;
 
 ##
@@ -50,9 +58,11 @@ _ "Postgresql";
 
 _ "Get the Postgres package and a "contrib" package that adds some additional";
 _ "utilities and functionality:";
+_ "sudo apt-get install -y postgresql postgresql-contrib;"
 sudo apt-get install -y postgresql postgresql-contrib;
 _ "Install libpq-dev library which contains binaries for installation and";
 _ "proper work in future of psycopg2 (postgres adapter for python).";
+_ "sudo apt-get install -y libpq-dev;"
 sudo apt-get install -y libpq-dev;
 #To check if everything was installed properly you can switch to postgres
 # administrative user and run interactive interpreter with next commands:
@@ -64,14 +74,19 @@ _ "Mongodb";
 #
 
 _ "Import the public key used by the package management system:";
+_ "sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv 0C49F3730359A14518585931BC711F9BA15703C6;"
 sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv 0C49F3730359A14518585931BC711F9BA15703C6;
 _ "Create the /etc/apt/sources.list.d/mongodb-org-3.4.list list file:";
+_ "echo \"deb [ arch=amd64 ] http://repo.mongodb.org/apt/ubuntu trusty/mongodb-org/3.4 multiverse\" | sudo tee /etc/apt/sources.list.d/mongodb-org-3.4.list;"
 echo "deb [ arch=amd64 ] http://repo.mongodb.org/apt/ubuntu trusty/mongodb-org/3.4 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-3.4.list;
 _ "Reload the local package database:";
+_ "sudo apt-get update;"
 sudo apt-get update;
 _ "Install the MongoDB packages:";
+_ "sudo apt-get install -y mongodb-org;"
 sudo apt-get install -y mongodb-org;
 _ "Start mongod service:";
+_ "sudo service mongod start;"
 sudo service mongod start;
 #To check if everything was installed properly you can run interactive
 # interpreter with next command: mongo
@@ -86,6 +101,7 @@ _ "Create users, databases and tables";
 #mysql -u root -p;
 #source /home/<user>/td/fixtures/create_mysql_db.sql;
 _ "Create user, db and table in mysql.";
+_ "mysql -u root -p TDDB < ~/td/fixtures/create_mysql_db.sql;"
 mysql -u root -p TDDB < ~/td/fixtures/create_mysql_db.sql;
 
 
@@ -95,6 +111,7 @@ mysql -u root -p TDDB < ~/td/fixtures/create_mysql_db.sql;
 #psql;
 #\i /home/<user>/td/fixtures/create_postgres_db.sql
 _ "Create user, db and table in postgres.";
+_ "sudo -u postgres psql TDDB < ~/td/fixtures/create_postgres_db.sql;"
 sudo -u postgres psql TDDB < ~/td/fixtures/create_postgres_db.sql;
 
 ###
@@ -102,15 +119,20 @@ _ "virtualenvwrapper";
 #
 
 _ "Get virtualenvwrapper from pypi:";
+_ "sudo pip install virtualenvwrapper;"
 sudo pip install virtualenvwrapper;
 _ "Append this to your user's ~/.bashrc file:";
 #source /usr/local/bin/virtualenvwrapper.sh;
+_ "echo "source /usr/local/bin/virtualenvwrapper.sh;" >> ~/.bashrc";
 echo "source /usr/local/bin/virtualenvwrapper.sh;" >> ~/.bashrc
 _ "Reboot your computer or just update your user's profile with source ~/.bashrc";
+_ "source ~/.bashrc;"
 source ~/.bashrc;
 _ "Now you can create own virtual environment:";
+_ "mkvirtualenv td;"
 mkvirtualenv td;
 _ "And work with it:";
+_ "workon td;"
 workon td;
 _ "Use deactivate to exit current virtual environ, lsvirtualenv and";
 _ "rmvirtualenv <name> to list all existing and remove single one by the name.";
@@ -127,6 +149,8 @@ _ "Install Python dependancies";
 #If you're not in the project's dir cd to it and then invoke command, which
 # installs the project in development mode (-e is for "editable") into the
 # current directory (.):
+_ "cd td;";
+_ "pip install -e .;";
 cd td;
 pip install -e .;
 #It is just pip wrapping on python setup.py develop, so you can use it too.
@@ -180,5 +204,6 @@ _ "Your username is user and password is 1234.";
 ## Tests
 
 _ "Install testing dependancies from setup.py 'tests_require' section:";
+_ "pip install -e \".[testing]\";"
 pip install -e ".[testing]";
 #or you can do it directly from the file with command pip install -r test_requirements.txt
