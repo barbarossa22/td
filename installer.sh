@@ -107,7 +107,7 @@ _ "** Create users, databases and tables **";
 #source /home/<user>/td/fixtures/create_mysql_db.sql;
 _ "Create user, db and table in mysql.";
 _ "mysql -u root -p < ~/td/fixtures/create_mysql_db.sql;"
-mysql -u root -p < ~/td/fixtures/create_mysql_db.sql;
+mysql -u root -p --force < ~/td/fixtures/create_mysql_db.sql;
 
 
 #Run script from postgres (path to script given as example, you need to provide
@@ -128,7 +128,7 @@ _ "sudo pip install virtualenvwrapper;"
 sudo pip install virtualenvwrapper;
 _ "Append this to your user's ~/.bashrc file:";
 #source /usr/local/bin/virtualenvwrapper.sh;
-_ "echo "source /usr/local/bin/virtualenvwrapper.sh;" >> ~/.bashrc";
+_ "echo \"source /usr/local/bin/virtualenvwrapper.sh;\" >> ~/.bashrc";
 echo "source /usr/local/bin/virtualenvwrapper.sh;" >> ~/.bashrc
 _ "Reboot your computer or just update your user's profile with source ~/.bashrc";
 _ "source ~/.bashrc;"
