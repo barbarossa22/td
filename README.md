@@ -1,6 +1,7 @@
 # td
 to-do list project playground
 
+You can use `install.sh` shell script to run automated environment setup (see description in that file), otherwise follow steps below to prepare everything manually.
 
 ## Initial setup on clean Ubuntu 14
 

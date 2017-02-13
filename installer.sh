@@ -1,5 +1,18 @@
 #!/usr/bin/env bash
 
+# How to use this script.
+# 1. Install git
+# sudo apt-get install git;
+# 2. Clone repo from github.
+# git clone https://github.com/barbarossa22/td.git;
+# 3. cd to cloned directory.
+# cd td;
+# 4. Add execute permissions to installer.sh script.
+# sudo chmod 755 installer.sh;
+# 5. Run this script with sudo.
+# sudo ./installer.sh
+# 6. Relax and wait.
+
 _() { printf "\033[1;31m$1\033[0m \n"; }
 
 
@@ -11,9 +24,6 @@ _ "*** Initial setup on clean Ubuntu 14 ***";
 _ "Reload the local package database:";
 _ "sudo apt-get update;"
 sudo apt-get update;
-_ "On clean ubuntu systems there is no in-built git so install it:";
-_ "sudo apt-get install -y git;"
-sudo apt-get install -y git;
 _ "Install package which includes additional header files, a static library";
 _ "and development tools for building Python modules:";
 _ "sudo apt-get install -y python-dev;"
@@ -129,9 +139,9 @@ sudo pip install virtualenvwrapper;
 _ "Append this to your user's ~/.bashrc file:";
 #source /usr/local/bin/virtualenvwrapper.sh;
 _ "echo \"source /usr/local/bin/virtualenvwrapper.sh;\" >> ~/.bashrc";
-echo "source /usr/local/bin/virtualenvwrapper.sh;" >> ~/.bashrc
+echo "source /usr/local/bin/virtualenvwrapper.sh;" >> ~/.bashrc;
 _ "Reboot your computer or just update your user's profile with source ~/.bashrc";
-_ "source ~/.bashrc;"
+_ "source ~/.bashrc;";
 source ~/.bashrc;
 _ "Now you can create own virtual environment:";
 _ "mkvirtualenv td;"
