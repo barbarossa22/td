@@ -9,6 +9,7 @@
 """
 import bcrypt
 
+
 class PasswordMaster(object):
     """Provide work with passwords hashing and checking."""
 
