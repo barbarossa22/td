@@ -31,7 +31,7 @@ def home(request):
     """Redirect from / to /todo_list url.
 
     :param request: instance-object which represents HTTP request.
-    :type: pyramid.request.Request
+    :type request: pyramid.request.Request
     :returns: HTTPFound exception as response object with status code 302.
     :raises: pyramid.httpexceptions.HTTPFound
 
@@ -45,7 +45,7 @@ def get_todo_list_page(request):
     """Return static/base.html at request on /todo_list url.
 
     :param request: instance-object which represents HTTP request.
-    :type: pyramid.request.Request
+    :type request: pyramid.request.Request
     :returns: object that is used to serve a file from static/base.html.
     :rtype: pyramid.response.FileResponse
 
@@ -63,7 +63,7 @@ def get_todo_list_items(request):
     /api/get_todo_list_items url.
 
     :param request: instance-object which represents HTTP request.
-    :type: pyramid.request.Request
+    :type request: pyramid.request.Request
     :returns: dict that is later transformed by json-renderer into response
     object with included JSON-serialized string made from this dict:
 
@@ -72,7 +72,7 @@ def get_todo_list_items(request):
 
     * {'items': None} otherwise, if items for user with current ip doesn't
     exist.
-    :rtype: dict.
+    :rtype: dict
 
     """
     settings = request.registry.settings
@@ -113,7 +113,7 @@ def add_todo_list_item(request):
     body in Mongo database.
 
     :param request: instance-object which represents HTTP request.
-    :type: pyramid.request.Request
+    :type request: pyramid.request.Request
     :returns: Response instance with 'OK' str body to indicate a success.
     :rtype: pyramid.response.Response
 
@@ -151,7 +151,7 @@ def get_login_page(request):
     """Return static/login.html at request on /login url.
 
     :param request: instance-object which represents HTTP request.
-    :type: pyramid.request.Request
+    :type request: pyramid.request.Request
     :returns: object that is used to serve a file from static/login.html.
     :rtype: pyramid.response.FileResponse
     """
@@ -167,7 +167,7 @@ def post_login_credentials(request):
     """Accept POST request with login and password from the client.
 
     :param request: instance-object which represents HTTP request.
-    :type: pyramid.request.Request
+    :type request: pyramid.request.Request
     :returns: if ok HTTPFound with auth. headers in response else HTTPForbidden
     """
     login = request.json_body["login"]
@@ -194,7 +194,7 @@ def logout(request):
     """Logout user.
 
     :param request: instance-object which represents HTTP request.
-    :type: pyramid.request.Request
+    :type request: pyramid.request.Request
     :returns: HTTPFound exception as response object with status code 302.
     :raises: pyramid.httpexceptions.HTTPFound
     """

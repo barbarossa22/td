@@ -61,11 +61,11 @@ def main(global_config, **settings):
         """Find all groups of user in the database and return list of them.
 
         :param userid: user's login name.
-        :type: str.
+        :type userid: str
         :param request: instance-object which represents HTTP request.
-        :type: pyramid.request.Request
-        :returns: list of groups (empty if no groups at all).
-        :rtype: list.
+        :type request: pyramid.request.Request
+        :return: list of groups (empty if no groups at all).
+        :rtype: list
         """
         query_output = db.select_one("groups", "Users",
                                      "username='%s'" % userid)
