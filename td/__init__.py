@@ -34,12 +34,13 @@ def main(global_config, **settings):
 
     parser = ConfigScanner(global_config['__file__'])
 
-    pgres_creds = parser.get_subsection_in_section('postgres', 'databases')
+    db_engine_type_in_use = settings['db_in_use']
+    db_creds = parser.get_subsection_in_section(db_engine_type_in_use, 'databases')
 
     settings['mongo_creds'] = parser.get_subsection_in_section('mongo',
                                                                'databases')
 
-    db = Connector('postgres', pgres_creds)
+    db = Connector(db_engine_type_in_use, db_creds)
 
     def connect_db_to_view(view_to_wrap):
         """Serve as decorator specified in config.add_view for db connections
