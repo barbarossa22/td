@@ -21,7 +21,9 @@ Get pip:
 
 `sudo apt-get install python-pip`
 
+Install libffi package(Foreign Function Interface library) which is needed for bcrypt python library.
 
+`sudo apt-get install libffi-dev`
 
 ## Setup databases
 

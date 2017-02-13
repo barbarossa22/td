@@ -22,6 +22,11 @@ _ "Get pip:";
 _ "sudo apt-get install -y python-pip;"
 sudo apt-get install -y python-pip;
 
+_ "Install libffi package(Foreign Function Interface library) which is needed";
+_ "for bcrypt python library.";
+_ "sudo apt-get install libffi-dev";
+sudo apt-get install libffi-dev
+
 ###
 _ "Setup databases";
 ##
