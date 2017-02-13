@@ -44,13 +44,13 @@ class MySQLDbAssessor(Assessor):
         """Initialize context-manager call with credentials.
 
         :param host: hostname.
-        :type: str
+        :type: str.
         :param user: username for authentication to local MySQL db server.
-        :type: str
+        :type: str.
         :param password: password for authentication to local MySQL db server.
-        :type: str
+        :type: str.
         :param db_name: database name to use.
-        :type: str
+        :type: str.
 
         """
         self.host = host
@@ -70,13 +70,13 @@ class PgresDbAssessor(Assessor):
         """Initialize context-manager call with credentials.
 
         :param db_name: database name to use.
-        :type: str
+        :type: str.
         :param user: username for authentication to local Postgres db server.
-        :type: str
+        :type: str.
         :param host: hostname.
-        :type: str
+        :type: str.
         :param password: password for authentication to local Postgres server.
-        :type: str
+        :type: str.
 
         """
         self.db_name = db_name
