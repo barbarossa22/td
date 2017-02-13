@@ -15,10 +15,6 @@ function post_login_credentials() {
         return;
     }
 
-    // $.post('/api/post_login_credentials', JSON.stringify({'login': login_input_value, 'password': password_input_value}), function() {
-    //    console.log('post success');
-    //});
-
     $.ajax({url: "/api/post_login_credentials",
             data: JSON.stringify({"login": login_input_value, "password": password_input_value}),
             type: "POST",
@@ -27,8 +23,13 @@ function post_login_credentials() {
                 sessionStorage.setItem("username", login_input_value);
                 $( location ).attr("href", "/todo_list");
             },
-            error: function() {
+            error: function(xhr) {
+                // When 401 unathorized comes throw a message about wrong credentials, otherwise inform that server is dead.
+                if (xhr.status == 401) {
                 alert("Wrong login or password.");
+                } else {
+                alert("Something went wrong on the server.")
+                }
             },
             });
 }
