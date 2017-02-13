@@ -24,8 +24,7 @@ logger = logging.getLogger(__name__)
 
 
 def forbidden_view(request):
-    if not authenticated_userid(request):
-        return HTTPFound(location='/login')
+    return HTTPFound(location="/login")
 
 
 def home(request):
@@ -53,7 +52,6 @@ def get_todo_list_page(request):
     """
     logger.debug("Get request for resource at /todo_list and replied with "
                  "file static/base.html")
-    logger.debug("authenticated_userid: %s", authenticated_userid(request))
     abs_path_to_base = "".join([os.path.dirname(__file__),
                                 os.sep,
                                 os.path.join("static", "base.html")])
@@ -74,7 +72,7 @@ def get_todo_list_items(request):
 
     * {'items': None} otherwise, if items for user with current ip doesn't
     exist.
-    :rtype: dict
+    :rtype: dict.
 
     """
     settings = request.registry.settings
@@ -92,9 +90,9 @@ def get_todo_list_items(request):
     else:
         user_id = user_id[0]
     mongo_creds = settings.mongo_creds
-    client = pymongo.MongoClient(mongo_creds['host'],
-                                 int(mongo_creds['port']))
-    db = client[mongo_creds['db_name']]
+    client = pymongo.MongoClient(mongo_creds["host"],
+                                 int(mongo_creds["port"]))
+    db = client[mongo_creds["db_name"]]
     items_collection = db.Items
     reply = items_collection.find({"owner_id": user_id},
                                   {"item": 1, "_id": 0})
@@ -132,7 +130,6 @@ def add_todo_list_item(request):
         logger.debug("User with such ip does not exist in the database, "
                      "creating new entry for him in Users table")
         db.insert("Users", "ip", ip)
-        logger.debug('here')
         user_id = db.select_one("id", "Users", "ip='%s'" % ip)[0]
     # Can't use .get here because of errror: TypeError:
     # 'builtin_function_or_method' object has no attribute '__getitem__'
@@ -160,7 +157,6 @@ def get_login_page(request):
     """
     logger.debug("Get request for resource at /login and replied with "
                  "file static/login.html")
-    logger.debug("authenticated_userid: %s", authenticated_userid(request))
     abs_path_to_base = "".join([os.path.dirname(__file__),
                                 os.sep,
                                 os.path.join("static", "login.html")])
@@ -172,15 +168,11 @@ def post_login_credentials(request):
 
     :param request: instance-object which represents HTTP request.
     :type: pyramid.request.Request
-    :returns:
-    :rtype:
-
+    :returns: if ok HTTPFound with auth. headers in response else HTTPForbidden
     """
     login = request.json_body["login"]
     password = request.json_body["password"]
     ip = request.client_addr
-    logger.debug("login: %s, password: %s, ip: %s", login, password, ip)
-
     password_master = PasswordMaster()
     db = request.registry.settings.db
     query_output = db.select_one("password", "Users", "username='%s'" % login)
@@ -189,13 +181,12 @@ def post_login_credentials(request):
         hashed_pword_from_db = query_output[0]
         if password_master.check_password(password, hashed_pword_from_db):
             headers = remember(request, login)
-            logger.debug(headers)
-            logger.debug('User %s has logged in right now.', login)
-            return HTTPFound('/todo_list', headers=headers)
+            logger.debug("User %s has logged in right now.", login)
+            return HTTPFound("/todo_list", headers=headers)
         else:
-            logger.debug('Wrong password.')
+            logger.debug("Wrong password.")
             return HTTPForbidden()
-    logger.debug('No such username in db.')
+    logger.debug("No such username in db.")
     return HTTPForbidden()
 
 
@@ -208,5 +199,5 @@ def logout(request):
     :raises: pyramid.httpexceptions.HTTPFound
     """
     headers = forget(request)
-    logger.debug('User %s logged out.', authenticated_userid(request))
-    return HTTPFound(location='/login', headers=headers)
+    logger.debug("User %s logged out.", authenticated_userid(request))
+    return HTTPFound(location="/login", headers=headers)

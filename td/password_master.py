@@ -22,7 +22,7 @@ class PasswordMaster(object):
         :rtype: str.
         """
         salt = bcrypt.gensalt()
-        hashed_password = bcrypt.hashpw(password.encode('utf8'), salt)
+        hashed_password = bcrypt.hashpw(password.encode("utf8"), salt)
         return hashed_password
 
     def check_password(self, password, hashed_password):
@@ -35,5 +35,5 @@ class PasswordMaster(object):
         :return: True or False on passwords comparison.
         :rtype: bool.
         """
-        result = bcrypt.checkpw(password.encode('utf8'), hashed_password)
+        result = bcrypt.checkpw(password.encode("utf8"), hashed_password)
         return result

@@ -24,21 +24,21 @@ class RootFactory(object):
 
     def __acl__(self):
         """Return list of mappings from principal to permission."""
-        return [(Allow, Everyone, 'everybody'),
-                (Allow, 'group:users', 'entry')]
+        return [(Allow, Everyone, "everybody"),
+                (Allow, "group:users", "entry")]
 
 
 def main(global_config, **settings):
     """ This function returns a Pyramid WSGI application.
     """
 
-    parser = ConfigScanner(global_config['__file__'])
+    parser = ConfigScanner(global_config["__file__"])
 
-    db_engine_type_in_use = settings['db_in_use']
-    db_creds = parser.get_subsection_in_section(db_engine_type_in_use, 'databases')
+    db_engine_type_in_use = settings["db_in_use"]
+    db_creds = parser.get_subsection_in_section(db_engine_type_in_use, "databases")
 
-    settings['mongo_creds'] = parser.get_subsection_in_section('mongo',
-                                                               'databases')
+    settings["mongo_creds"] = parser.get_subsection_in_section("mongo",
+                                                               "databases")
 
     db = Connector(db_engine_type_in_use, db_creds)
 
@@ -52,7 +52,7 @@ def main(global_config, **settings):
         :return: Wrapped view func with injected db instance in it's request.
         """
         def wrapper(context, request):
-            request.registry.settings['db'] = db
+            request.registry.settings["db"] = db
             response = view_to_wrap(context, request)
             return response
         return wrapper
@@ -70,13 +70,13 @@ def main(global_config, **settings):
         query_output = db.select_one("groups", "Users",
                                      "username='%s'" % userid)
         if query_output is not None:
-            groups_list = query_output[0].split(', ')
-            logger.debug('Authenticated user in this request is in groups: %s',
+            groups_list = query_output[0].split(", ")
+            logger.debug("Authenticated user in this request is in groups: %s",
                          groups_list)
             return groups_list
         return []
 
-    authn_policy = AuthTktAuthenticationPolicy(settings['auth.secret'],
+    authn_policy = AuthTktAuthenticationPolicy(settings["auth.secret"],
                                                callback=group_finder)
 
     authz_policy = ACLAuthorizationPolicy()
@@ -88,36 +88,36 @@ def main(global_config, **settings):
     config.add_static_view("static",
                            path="td:static",
                            cache_max_age=3600)
-    config.add_forbidden_view('td.views.forbidden_view')
+    config.add_forbidden_view("td.views.forbidden_view")
 
-    config.add_view('td.views.home', route_name='home', permission='entry')
-    config.add_view('td.views.get_todo_list_page',
-                    route_name='todo_list',
+    config.add_view("td.views.home", route_name="home", permission="entry")
+    config.add_view("td.views.get_todo_list_page",
+                    route_name="todo_list",
                     request_method="GET",
-                    permission='entry')
-    config.add_view('td.views.get_todo_list_items',
-                    route_name='get_todo_list_items',
+                    permission="entry")
+    config.add_view("td.views.get_todo_list_items",
+                    route_name="get_todo_list_items",
                     renderer="json",
                     xhr=True,
                     request_method="GET",
                     decorator=connect_db_to_view,
-                    permission='entry')
-    config.add_view('td.views.add_todo_list_item',
-                    route_name='add_todo_list_item',
+                    permission="entry")
+    config.add_view("td.views.add_todo_list_item",
+                    route_name="add_todo_list_item",
                     xhr=True,
                     request_method="POST",
                     decorator=connect_db_to_view,
-                    permission='entry')
-    config.add_view('td.views.get_login_page',
-                    route_name='login',
-                    request_method='GET')
-    config.add_view('td.views.post_login_credentials',
-                    route_name='post_login_credentials',
+                    permission="entry")
+    config.add_view("td.views.get_login_page",
+                    route_name="login",
+                    request_method="GET")
+    config.add_view("td.views.post_login_credentials",
+                    route_name="post_login_credentials",
                     xhr=True,
-                    request_method='POST',
+                    request_method="POST",
                     decorator=connect_db_to_view)
-    config.add_view('td.views.logout',
-                    route_name='logout')
+    config.add_view("td.views.logout",
+                    route_name="logout")
 
     config.add_route("home", "/")
     config.add_route("todo_list", "/todo_list")
