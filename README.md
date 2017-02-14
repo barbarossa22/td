@@ -1,6 +1,7 @@
 # td
 to-do list project playground
 
+You can use `install.sh` shell script to run automated environment setup (see description in that file), otherwise follow steps below to prepare everything manually.
 
 ## Initial setup on clean Ubuntu 14
 
@@ -21,7 +22,9 @@ Get pip:
 
 `sudo apt-get install python-pip`
 
+Install libffi package(Foreign Function Interface library) which is needed for bcrypt python library.
 
+`sudo apt-get install libffi-dev`
 
 ## Setup databases
 
