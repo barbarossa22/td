@@ -137,12 +137,10 @@ _ "Get virtualenvwrapper from pypi:";
 _ "sudo pip install virtualenvwrapper;"
 sudo pip install virtualenvwrapper;
 _ "Append this to your user's ~/.bashrc file:";
-#source /usr/local/bin/virtualenvwrapper.sh;
 _ "echo \"source /usr/local/bin/virtualenvwrapper.sh;\" >> ~/.bashrc";
 echo "source /usr/local/bin/virtualenvwrapper.sh;" >> ~/.bashrc;
-_ "Reboot your computer or just update your user's profile with source ~/.bashrc";
-_ "source ~/.bashrc;";
-source ~/.bashrc;
+source /usr/local/bin/virtualenvwrapper.sh;
+
 _ "Now you can create own virtual environment:";
 _ "mkvirtualenv td;"
 mkvirtualenv td;
@@ -189,7 +187,7 @@ _ "** Create user to login the app. **";
 #\c TDDB;
 #insert into "Users" (id, ip, username, password, groups) values (1, '127.0.0.1', 'user', '$2b$12$/zC.07EVRZc3Qiyymhzcz.bWaJFKde0nepVpx6cZZowz0WQZ7Wp.W', 'group:users');
 _ "Insert new app's user into pgres db.";
-postgres_template="insert into \"Users\" (id, ip, username, password, groups) values (1, '127.0.0.1', 'user', '$2b$12$/zC.07EVRZc3Qiyymhzcz.bWaJFKde0nepVpx6cZZowz0WQZ7Wp.W', 'group:users');"
+postgres_template="insert into \"Users\" (id, ip, username, password, groups) values (1, '127.0.0.1', 'user', '\$2b\$12$/zC.07EVRZc3Qiyymhzcz.bWaJFKde0nepVpx6cZZowz0WQZ7Wp.W', 'group:users');"
 sudo -u postgres psql TDDB << EOF
 $postgres_template;
 EOF
@@ -200,7 +198,7 @@ EOF
 #use TDDB;
 #insert into Users (id, ip, username, password, groups) values (1, '127.0.0.1', 'user', '$2b$12$/zC.07EVRZc3Qiyymhzcz.bWaJFKde0nepVpx6cZZowz0WQZ7Wp.W', 'group:users');
 _ "Insert new app's user into mysql db.";
-mysql_template="insert into Users (id, ip, username, password, groups) values (1, '127.0.0.1', 'user', '$2b$12$/zC.07EVRZc3Qiyymhzcz.bWaJFKde0nepVpx6cZZowz0WQZ7Wp.W', 'group:users');"
+mysql_template="insert into Users (id, ip, username, password, groups) values (1, '127.0.0.1', 'user', '\$2b\$12$/zC.07EVRZc3Qiyymhzcz.bWaJFKde0nepVpx6cZZowz0WQZ7Wp.W', 'group:users');"
 mysql -u root -p TDDB << EOF
 $mysql_template;
 EOF
@@ -220,3 +218,8 @@ _ "Your username is user and password is 1234.";
 # they're detected causes the server to restart.
 #Now app is accessible from the browser at address http://localhost:6543 or
 # whatever path/port you provide inside your configs.
+
+
+_ "Reboot your computer in 5 seconds."
+sleep 5;
+sudo reboot;
