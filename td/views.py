@@ -70,36 +70,39 @@ def get_todo_list_items(request):
     * {'items': ['sleep', 'eat', 'repeat']} or similar user-defined notes in
     list if they exist in the database;
 
-    * {'items': None} otherwise, if items for user with current ip doesn't
+    * {'items': None} otherwise, if items for user with current id doesn't
     exist.
     :rtype: dict
 
     """
     settings = request.registry.settings
     ip = request.client_addr
+    login_name = authenticated_userid(request)
     logger.debug("Get request for todo list items at "
-                 "/api/get_todo_list_items from user with ip %s",
-                 ip)
+                 "/api/get_todo_list_items from user with ip %s and username"
+                 "'%s'", ip, login_name)
     db = settings["db"]
-    user_id = db.select_one("id", "Users", "ip='%s'" % ip)
-    if user_id is None:
-        logger.debug("This user is not in the database and that's why "
-                     "items for him don't exist, reply with "
-                     "{'items': null} JSON.")
-        return {"items": None}
-    else:
-        user_id = user_id[0]
+
+    user_int_id = db.select_one("id", "Users", "username='%s'" % login_name)
+    if user_int_id is None:
+        return HTTPUnauthorized()
+    # extract id integer from tuple like (2,)[0] -> 2
+    user_int_id = user_int_id[0]
+
     mongo_creds = settings["mongo_creds"]
     client = pymongo.MongoClient(mongo_creds["host"],
                                  int(mongo_creds["port"]))
-    db = client[mongo_creds["db_name"]]
-    items_collection = db.Items
-    reply = items_collection.find({"owner_id": user_id},
+    mongo_db = client[mongo_creds["db_name"]]
+    items_collection = mongo_db.Items
+    reply = items_collection.find({"owner_id": user_int_id},
                                   {"item": 1, "_id": 0})
     items = [document["item"] for document in reply]
+    if len(items) == 0:
+        logger.debug("Items for this user don't exist, reply with "
+                     "{'items': null} JSON.")
+        return {"items": None}
     logger.debug("Found existing items in the database, reply with "
-                 "{'items': %s} JSON object.",
-                 items)
+                 "{'items': %s} JSON object.", items)
     return {"items": items}
 
 
@@ -107,7 +110,7 @@ def add_todo_list_item(request):
     """ Add new item to the database.
 
     When request with POST method at /api/add_todo_list_item arrives then
-    function checks if user's ip exists in the Postgres database table 'Users'.
+    function checks if user's id exists in the Postgres database table 'Users'.
     If no then raises HTTPUnauthorized.
 
     :param request: instance-object which represents HTTP request.
@@ -118,21 +121,24 @@ def add_todo_list_item(request):
     """
     settings = request.registry.settings
     ip = request.client_addr
-    logger.debug("User with ip %s is trying to add new item with POST "
-                 "request on /api/add_todo_list_items",
-                 ip)
+    login_name = authenticated_userid(request)
+    logger.debug("User with ip %s and username '%s' is trying to add new item"
+                 "with POST request on /api/add_todo_list_items",
+                 ip, login_name)
 
     db = settings["db"]
-    user_id = db.select_one("id", "Users", "ip='%s'" % ip)
-    if user_id is None:
+    user_int_id = db.select_one("id", "Users", "username='%s'" % login_name)
+    if user_int_id is None:
         return HTTPUnauthorized()
+    # extract id integer from tuple like (2,)[0] -> 2
+    user_int_id = user_int_id[0]
     mongo_creds = settings["mongo_creds"]
     client = pymongo.MongoClient(mongo_creds['host'],
                                  int(mongo_creds['port']))
-    db = client[mongo_creds['db_name']]
-    items_collection = db.Items
+    mongo_db = client[mongo_creds['db_name']]
+    items_collection = mongo_db.Items
     items_collection.insert_one({"item": request.json_body["item"],
-                                 "owner_id": user_id})
+                                 "owner_id": user_int_id})
 
     logger.debug("Successfully added item '%s' to the database.",
                  request.json_body["item"])
