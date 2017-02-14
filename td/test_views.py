@@ -63,7 +63,7 @@ class TestItemsAdding(unittest.TestCase):
         response = views.add_todo_list_item(self.request)
         self.assertIn("items", self.request.session)
         self.assertEqual(self.request.session.get("items"),
-                        ["old item", "wake up"])
+                         ["old item", "wake up"])
         self.assertEqual(response.body, "OK")
 
 
@@ -95,5 +95,5 @@ class TestTodoListPageGetting(unittest.TestCase):
         with known html code in it's body.
         """
         response = views.get_todo_list_page(self.request)
-        self.assertIn("<div id='add_item_panel' class='input-group'>",
+        self.assertIn('<div id="add_item_panel" class="input-group">',
                       response.body)

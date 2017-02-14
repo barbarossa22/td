@@ -6,3 +6,5 @@ __pycache__/*
 .cache/*
 *.pyc
 td.log
+build/*
+*~
