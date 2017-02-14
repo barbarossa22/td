@@ -70,7 +70,7 @@ def get_todo_list_items(request):
     * {'items': ['sleep', 'eat', 'repeat']} or similar user-defined notes in
     list if they exist in the database;
 
-    * {'items': None} otherwise, if items for user with current ip doesn't
+    * {'items': None} otherwise, if items for user with current id doesn't
     exist.
     :rtype: dict
 
@@ -86,7 +86,6 @@ def get_todo_list_items(request):
     user_int_id = db.select_one("id", "Users", "username='%s'" % login_name)
     if user_int_id is None:
         return HTTPUnauthorized()
-    logger.debug("%s %s", user_int_id, user_int_id[0])
     # extract id integer from tuple like (2,)[0] -> 2
     user_int_id = user_int_id[0]
 
@@ -111,7 +110,7 @@ def add_todo_list_item(request):
     """ Add new item to the database.
 
     When request with POST method at /api/add_todo_list_item arrives then
-    function checks if user's ip exists in the Postgres database table 'Users'.
+    function checks if user's id exists in the Postgres database table 'Users'.
     If no then raises HTTPUnauthorized.
 
     :param request: instance-object which represents HTTP request.
