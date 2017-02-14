@@ -37,12 +37,13 @@ function post_new_item() {
     }
 
     $.post("/api/add_todo_list_item", JSON.stringify({"item": input_value }), function() {
+        $("#add_item_input").val(""); // clear input
         if ($("#initial_info").length) {
             // check if initial_info p exists and remove it after the moment when user adds new item to list
             $("#initial_info").remove();
         }
-        $("<li></li>").html(escape_html_tag_syntax(input_value)).appendTo("#tasks_list");
-        $("#add_item_input").val(""); // clear input
+        $("#tasks_list").empty();
+        get_items()
         console.log("post success");
     });
 }
