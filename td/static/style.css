@@ -9,7 +9,6 @@ body {
 }
 
 #add_item_panel {
-    width: 310px;
     margin-bottom: 20px;
 }
 
@@ -20,4 +19,20 @@ body {
 #login_btn {
     width: 310px;
     margin-top: 20px;
+}
+
+/*
+#category_choice {
+    width: 310px;
+}
+.but {width: 33%;}
+*/
+
+.btn-group {
+    display: flex;
+    flex-direction: row;
+}
+
+.btn-group > button {
+    width: 100%;
 }
