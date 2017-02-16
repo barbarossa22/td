@@ -69,8 +69,11 @@ def get_todo_list_items(request):
     :returns: dict that is later transformed by json-renderer into response
     object with included JSON-serialized string made from this dict:
 
-    * {'items': ['sleep', 'eat', 'repeat']} or similar user-defined notes in
-    list if they exist in the database;
+    * {'items': [{'item_value': 'sleep', 'category': 'green'},
+                 {'item_value': 'eat', 'category': 'red'},
+                 {'item_value': 'repeat', 'category': 'yellow'}
+                ]} or similar user-defined notes in list if they exist in the
+    database;
 
     * {'items': None} otherwise, if items for user with current id doesn't
     exist.
@@ -103,8 +106,10 @@ def get_todo_list_items(request):
     mongo_db = client[mongo_creds["db_name"]]
     items_collection = mongo_db.Items
     reply = items_collection.find({"owner_id": user_int_id},
-                                  {"item": 1, "_id": 0})
-    items = [document["item"] for document in reply]
+                                  {"item_value": 1, "category": 1, "_id": 0})
+    items = [{"item_value": document["item_value"],
+              "category": document["category"]}
+             for document in reply]
     if len(items) == 0:
         logger.debug("Items for this user don't exist, reply with "
                      "{'items': null} JSON.")
@@ -145,11 +150,11 @@ def add_todo_list_item(request):
                                  int(mongo_creds['port']))
     mongo_db = client[mongo_creds['db_name']]
     items_collection = mongo_db.Items
-    items_collection.insert_one({"item": request.json_body["item"],
+    items_collection.insert_one({"item_value": request.json_body["item_value"],
+                                 "category": request.json_body["category"],
                                  "owner_id": user_int_id})
-
     logger.debug("Successfully added item '%s' to the database.",
-                 request.json_body["item"])
+                 request.json_body["item_value"])
 
     return Response("OK")
 

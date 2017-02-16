@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta charset="UTF-8" name="viewport" content="width=device-width, initial-scale=1">
-    <title>Test</title>
+    <title>To-do list</title>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css" integrity="sha384-rwoIResjU2yc3z8GV/NPeZWAv56rSmLldC3R/AZzGRnGxQQKnKkoFVhFQhNUwEyJ" crossorigin="anonymous">
     <link rel="stylesheet" href="static/style.css" />
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" />
@@ -14,10 +14,10 @@
             <input id="add_item_input" type="text" class="form-control"/>
             <div class="input-group-btn">
                 <button type="button" class="btn btn-secondary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
-                <div class="dropdown-menu">
-                    <span class="dropdown-item"><input type="radio" checked/> Green</span>
-                    <span class="dropdown-item"><input type="radio" /> Yellow</span>
-                    <span class="dropdown-item"><input type="radio" /> Red</span>
+                <div class="dropdown-menu" id="item_category_rbtns">
+                    <span class="dropdown-item"><input name="categories" type="radio" value="red" id="red_rbtn" checked/> Red</span>
+                    <span class="dropdown-item"><input name="categories" type="radio" value="yellow" id="yellow_rbtn"/> Yellow</span>
+                    <span class="dropdown-item"><input name="categories" type="radio" value="green" id="green_rbtn"/> Green</span>
                 </div>
             </div>
             <div class="input-group-btn">
@@ -25,21 +25,23 @@
             </div>
         </div>
 
-        <div class="btn-group btn-group-justified" id="category_choice" data-toggle="buttons">
-            <button class="btn btn-danger but">
-                <input name="options" type="radio"> Red </input>
-            </button>
-            <button class="btn btn-warning but">
-                <input name="options" type="radio"> Yellow </input>
-            </button>
-            <button class="btn btn-success but" id="one">
-                <input name="options" type="radio" checked> Green </input>
-            </button>
+        <div class="btn-group" id="category_checkboxes" data-toggle="buttons">
+            <label class="btn red-btn active">
+                <input type="checkbox" value="red" checked="" onchange="get_items()">
+                Red
+            </label>
+            <label class="btn yellow-btn active">
+                <input type="checkbox" value="yellow" checked="" onchange="get_items()">
+                Yellow
+            </label>
+            <label class="btn green-btn active">
+                <input type="checkbox" value="green" checked="" onchange="get_items()">
+                Green
+            </label>
         </div>
 
-        <div id="tasks_panel" class="">
-            <ul id="tasks_list">
-            </ul>
+        <div id="tasks_panel">
+            <ul id="tasks_list"></ul>
         </div>
     </div>
     <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
