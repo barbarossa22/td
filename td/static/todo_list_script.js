@@ -5,7 +5,7 @@ function escape_html_tag_syntax(text) {
 
 function get_items() {
     // Get JSON repsonse with array of existing items and their category, and then create html elements for their representation on the web-page.
-    selected_chboxes_objs_list = $("#category_checkboxes").find("input:checkbox:checked");
+    var selected_chboxes_objs_list = $("#category_checkboxes").find("input:checkbox:checked");
     var lst = []
     selected_chboxes_objs_list.map(function(index, item) {
             lst.push(item.value);
@@ -15,7 +15,9 @@ function get_items() {
         $("#tasks_list").empty();
 
         if (response.items === null) {
-            $('<p id="initial_info">There are no tasks addded. You can use panel above to do it!</p>').appendTo('#tasks_panel');
+            if ($("#initial_info").length == 0) {
+                $('<p id="initial_info">There are no tasks addded. You can use panel above to do it!</p>').appendTo('#tasks_panel');
+            }
         } else {
             console.log("Response content has items and we can build our list!");
             for (var i=response.items.length-1; i>-1; i--) {
@@ -24,7 +26,7 @@ function get_items() {
                     console.log("No such category in the list of selected by user categories to view.");
                 }
                 else {
-                    var li = $("<li></li>").html(escape_html_tag_syntax(response.items[i].item_value));
+                    var li = $(`<li data-id=${response.items[i].id}></li>`).html(escape_html_tag_syntax(response.items[i].item_value));
                     li.toggleClass(`${response.items[i].category}_li`);
                     li.appendTo("#tasks_list");
                 }
@@ -48,7 +50,7 @@ function post_new_item() {
         alert("You can save only non-empty text!");
         return;
     }
-    category_name=$("#item_category_rbtns").find("input:radio[name='categories']:checked")[0].value;
+    var category_name=$("#item_category_rbtns").find("input:radio[name='categories']:checked")[0].value;
     $.post("/api/add_todo_list_item", JSON.stringify({"item_value": input_value, "category": category_name }), function() {
         $("#add_item_input").val(""); // clear input
         if ($("#initial_info").length) {
@@ -62,15 +64,63 @@ function post_new_item() {
 
 function draw_logout_btn() {
     // if login in sessionStorage prepend logout button to #main:
-    username = sessionStorage.getItem("username");
+    var username = sessionStorage.getItem("username");
     if (username) {
-        template = `<p class="text-right">Logged in as <em>${username}</em>. <a href="/logout" onclick="sessionStorage.removeItem('username');"><span class="fa fa-sign-out"></span>Logout</a></p>`
+        var template = `<p class="text-right">Logged in as <em>${username}</em>. <a href="/logout" onclick="sessionStorage.removeItem('username');"><span class="fa fa-sign-out"></span>Logout</a></p>`
         $("#main").prepend(template);
     }
 }
 
+function show_removal_modal(item_to_remove) {
+    let text = item_to_remove.text();
+    let id = item_to_remove.data("id");
+    let modal = $('#myModal');
+
+    let p = $("<p></p>");
+    p.text(`Are you sure you want to remove "${text}" item?`);
+    $(".modal-content").prepend(p);
+
+    modal.css('display', 'block');
+
+    $("#close_modal").on("click", function(event) {
+        event.preventDefault();
+        event.stopImmediatePropagation();
+
+        modal.css("display", "none");
+        p.remove();
+
+        return false;
+        });
+
+    $("#submit_modal").on("click", function(event) {
+        event.preventDefault();
+        event.stopImmediatePropagation();
+
+        $.post("/api/remove_item", JSON.stringify({"id": id}), function() {
+            //item_to_remove.remove();
+            $("#tasks_list").find(`li[data-id='${id}']`)[0].remove();
+            modal.css("display", "none");
+            p.remove();
+            get_items()
+        });
+
+        return false;
+    });
+    return false;
+}
+
+
 $(document).ready(function() {
         draw_logout_btn();
         get_items();
+        $("#tasks_list").on("click", "li", function(event) {
+            event.preventDefault();
+            event.stopImmediatePropagation();
+
+            //event.stopPropagation();
+            //event.preventDefault();
+            show_removal_modal($(this));
+            return false;
+        });
     }
 );

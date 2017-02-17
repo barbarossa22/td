@@ -120,6 +120,8 @@ def main(global_config, **settings):
                     decorator=connect_db_to_view)
     config.add_view(view="td.views.logout",
                     route_name="logout")
+    config.add_view("td.views.remove_item",
+                    route_name="remove_item")
 
     config.add_route(name="home", path="/")
     config.add_route(name="todo_list", path="/todo_list")

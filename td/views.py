@@ -13,6 +13,7 @@ import logging
 import os
 import pymongo
 
+from bson import ObjectId
 from pyramid.httpexceptions import (HTTPFound,
                                     HTTPUnauthorized,
                                     HTTPInternalServerError)
@@ -106,9 +107,10 @@ def get_todo_list_items(request):
     mongo_db = client[mongo_creds["db_name"]]
     items_collection = mongo_db.Items
     reply = items_collection.find({"owner_id": user_int_id},
-                                  {"item_value": 1, "category": 1, "_id": 0})
+                                  {"item_value": 1, "category": 1, "_id": 1})
     items = [{"item_value": document["item_value"],
-              "category": document["category"]}
+              "category": document["category"],
+              "id": str(document["_id"])}
              for document in reply]
     if len(items) == 0:
         logger.debug("Items for this user don't exist, reply with "
@@ -159,6 +161,28 @@ def add_todo_list_item(request):
     return Response("OK")
 
 
+
+def remove_item(request):
+    """Delete item from database by id.
+
+    :param request: instance-object which represents HTTP request.
+    :type request: pyramid.request.Request
+    :returns: Response instance with 'OK' str body to indicate a success.
+    :rtype: pyramid.response.Response
+    """
+    id = ObjectId(request.json_body['id'])
+
+    settings = request.registry.settings
+    mongo_creds = settings["mongo_creds"]
+    client = pymongo.MongoClient(mongo_creds['host'],
+                                 int(mongo_creds['port']))
+    mongo_db = client[mongo_creds['db_name']]
+    items_collection = mongo_db.Items
+    items_collection.delete_one({"_id": id})
+    logger.debug("Removing item from mongo db with id: %s", id)
+    return Response("OK")
+
+
 def get_login_page(request):
     """Return static/login.html at request on /login url.
 
@@ -184,7 +208,6 @@ def post_login_credentials(request):
     """
     login = request.json_body["login"]
     password = request.json_body["password"]
-    ip = request.client_addr
     password_master = PasswordMaster()
 
     db = request.registry.settings["db"]
