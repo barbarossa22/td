@@ -12,8 +12,6 @@
 import MySQLdb
 import psycopg2
 
-from pyramid.threadlocal import get_current_registry
-
 from td.exceptions import WrongEngineException
 
 
@@ -110,9 +108,9 @@ class Connector(object):
         """Initialize Connector with provided as arg database type.
 
         :param engine_type: Type of engine ('mysql' or 'postgres').
-        :type engine_type: str.
+        :type engine_type: str
         :param creds_dict: Dict with creds and params.
-        :type creds_dict: dict.
+        :type creds_dict: dict
         """
         self.engine_type = engine_type
         self.__credentials_dict = creds_dict
@@ -127,11 +125,11 @@ class Connector(object):
         data in the table for executed query then return value is None.
 
         :param column_names: column names in the table to select.
-        :type column_names: str.
+        :type column_names: str
         :param table: table name in the db.in  t
-        :type table: str.
+        :type table: str
         :param where_clause: condition for sql where clause.
-        :type where_clause: str.
+        :type where_clause: str
         :return: tuple representing single row or None if no data in db.
         :rtype: tuple
         :raises: WrongEngineException
@@ -160,11 +158,11 @@ class Connector(object):
         executed query then function returns single tuple ().
 
         :param column_names: column names in the table to select.
-        :type column_names: str.
+        :type column_names: str
         :param table: table name in the db.
-        :type table: str.
+        :type table: str
         :param where_clause: condition for sql where clause.
-        :type where_clause: str.
+        :type where_clause: str
         :return: tuple with all rows as included elements-tuples in it.
         :rtype: tuple
         :raises: WrongEngineException
@@ -203,13 +201,13 @@ class Connector(object):
         the table for executed query then return value is None.
 
         :param column_names: column names in the table to select.
-        :type column_names: str.
+        :type column_names: str
         :param table: table name in the db.
-        :type table: str.
+        :type table: str
         :param where_clause: condition for sql where clause.
-        :type where_clause: str.
+        :type where_clause: str
         :param how_many: defines selection of only first row or all rows.
-        :type how_many: str.
+        :type how_many: str
         :return: tuple with fetched data from selected query.
         :rtype: tuple
         """
@@ -251,13 +249,13 @@ class Connector(object):
         the table for executed query then return value is None.
 
         :param column_names: column names in the table to select.
-        :type column_names: str.
+        :type column_names: str
         :param table: table name in the db to select from.
-        :type table: str.
+        :type table: str
         :param where_clause: condition for sql where clause.
-        :type where_clause: str.
+        :type where_clause: str
         :param how_many: defines selection of only first row or all rows.
-        :type how_many: str.
+        :type how_many: str
         :return: tuple with fetched data from selected query.
         :rtype: tuple
         """
@@ -289,11 +287,11 @@ class Connector(object):
         .insert("Users", "name", "Jonathan Swift")
 
         :param table: table name in the db for insert operation.
-        :type table: str.
+        :type table: str
         :param column_names: column names in the table to affect.
-        :type column_names: str.
+        :type column_names: str
         :param values: values to be inserted
-        :type values: str.
+        :type values: str
         :return: None
         :rtype: None
         :raises: WrongEngineException

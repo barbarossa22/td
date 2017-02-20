@@ -11,6 +11,12 @@ from ConfigParser import SafeConfigParser
 
 
 class ConfigScanner:
+    """Scan configs by sections and subsections.
+
+    Initialize class passing to it config location path as string.
+
+    Two public methods availble: parse_section and get_subsection_in_section.
+    """
     def __init__(self, config_location):
         self.config_location = config_location
 
@@ -22,10 +28,10 @@ class ConfigScanner:
          {'mysql': {'user': 'root', 'password': '1234'},
           'postgres': {'host': 'localhost'}}
 
-        :param section_name:
-        :type: str.
+        :param section_name: section name taken from square brackets.
+        :type param: str
         :return: dictionary with params for each unique key.
-        :rtype: dict.
+        :rtype: dict
         """
         parser = SafeConfigParser()
         parser.read(self.config_location)
@@ -43,12 +49,12 @@ class ConfigScanner:
     def get_subsection_in_section(self, subsection_name, section_name):
         """ Get dict of params for one single key (subsection) in the section.
 
-        :param subsection_name:
-        :type: str.
-        :param section_name:
-        :type: str.
+        :param subsection_name: prefix of the key which stands before the dot.
+        :type subsection_name: str
+        :param section_name: section name taken from square brackets.
+        :type section_name: str
         :return: dictionary with items for single unique key in section.
-        :rtype: dict.
+        :rtype: dict
         """
         section = self.parse_section(section_name)
         return section.get(subsection_name)

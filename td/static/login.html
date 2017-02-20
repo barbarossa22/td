@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8" name="viewport" content="width=device-width, initial-scale=1">
+    <title>Login</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css" integrity="sha384-rwoIResjU2yc3z8GV/NPeZWAv56rSmLldC3R/AZzGRnGxQQKnKkoFVhFQhNUwEyJ" crossorigin="anonymous">
+    <link rel="stylesheet" href="static/style.css" />
+</head>
+
+<body>
+
+    <div id="main">
+        <span>Login:</span>
+        <input id="login_input" type="text" class="form-control"/>
+        <span>Password:</span>
+        <input id="password_input" type="password" class="form-control has-error has-feedback"/>
+        <input id="login_btn" type="button" value="Log me in" class="btn btn-success" onclick="post_login_credentials();"/>
+    </div>
+    <script src="//oss.maxcdn.com/libs/jquery/1.10.2/jquery.min.js"></script>
+    <script src="static/login_script.js"></script>
+</body>
+
+</html>
