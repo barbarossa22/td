@@ -72,53 +72,40 @@ function draw_logout_btn() {
 }
 
 function show_removal_modal(item_to_remove) {
-    let text = item_to_remove.text();
-    let id = item_to_remove.data("id");
-    let modal = $('#myModal');
 
-    let p = $("<p></p>");
+    var text = item_to_remove.text();
+    var id = item_to_remove.data("id");
+    var modal = $('#myModal');
+
+    var p = $("<p></p>");
     p.text(`Are you sure you want to remove "${text}" item?`);
     $(".modal-content").prepend(p);
 
     modal.css('display', 'block');
 
-    $("#close_modal").on("click", function(event) {
-        event.preventDefault();
-        event.stopImmediatePropagation();
-
+    $("#close_modal").off().on("click", function(event) {
         modal.css("display", "none");
         p.remove();
-
-        return false;
         });
 
-    $("#submit_modal").on("click", function(event) {
-        event.preventDefault();
-        event.stopImmediatePropagation();
+    $("#submit_modal").off().on("click", function(event) {
 
         $.post("/api/remove_item", JSON.stringify({"id": id}), function() {
-            //item_to_remove.remove();
-            $("#tasks_list").find(`li[data-id='${id}']`)[0].remove();
-            modal.css("display", "none");
-            p.remove();
-            get_items()
+            item_to_remove.remove();
+            get_items();
         });
 
-        return false;
+        p.remove();
+        modal.css("display", "none");
     });
-    return false;
 }
 
 
 $(document).ready(function() {
         draw_logout_btn();
         get_items();
-        $("#tasks_list").on("click", "li", function(event) {
-            event.preventDefault();
-            event.stopImmediatePropagation();
 
-            //event.stopPropagation();
-            //event.preventDefault();
+        $("#tasks_list").on("click", "li", function(event) {
             show_removal_modal($(this));
             return false;
         });

@@ -161,7 +161,6 @@ def add_todo_list_item(request):
     return Response("OK")
 
 
-
 def remove_item(request):
     """Delete item from database by id.
 
