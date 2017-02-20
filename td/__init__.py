@@ -76,7 +76,7 @@ def main(global_config, **settings):
             return groups_list
         return []
 
-    authn_policy = AuthTktAuthenticationPolicy(settings["auth.secret"],
+    authn_policy = AuthTktAuthenticationPolicy(secret=settings["auth.secret"],
                                                callback=group_finder)
 
     authz_policy = ACLAuthorizationPolicy()
@@ -85,46 +85,50 @@ def main(global_config, **settings):
     config.set_authentication_policy(authn_policy)
     config.set_authorization_policy(authz_policy)
 
-    config.add_static_view("static",
+    config.add_static_view(name="static",
                            path="td:static",
                            cache_max_age=3600)
-    config.add_forbidden_view("td.views.forbidden_view")
+    config.add_forbidden_view(view="td.views.forbidden_view")
 
-    config.add_view("td.views.home", route_name="home", permission="entry")
-    config.add_view("td.views.get_todo_list_page",
+    config.add_view(view="td.views.home",
+                    route_name="home",
+                    permission="entry")
+    config.add_view(view="td.views.get_todo_list_page",
                     route_name="todo_list",
                     request_method="GET",
                     permission="entry")
-    config.add_view("td.views.get_todo_list_items",
+    config.add_view(view="td.views.get_todo_list_items",
                     route_name="get_todo_list_items",
                     renderer="json",
                     xhr=True,
                     request_method="GET",
                     decorator=connect_db_to_view,
                     permission="entry")
-    config.add_view("td.views.add_todo_list_item",
+    config.add_view(view="td.views.add_todo_list_item",
                     route_name="add_todo_list_item",
                     xhr=True,
                     request_method="POST",
                     decorator=connect_db_to_view,
                     permission="entry")
-    config.add_view("td.views.get_login_page",
+    config.add_view(view="td.views.get_login_page",
                     route_name="login",
                     request_method="GET")
-    config.add_view("td.views.post_login_credentials",
+    config.add_view(view="td.views.post_login_credentials",
                     route_name="post_login_credentials",
                     xhr=True,
                     request_method="POST",
                     decorator=connect_db_to_view)
-    config.add_view("td.views.logout",
+    config.add_view(view="td.views.logout",
                     route_name="logout")
 
-    config.add_route("home", "/")
-    config.add_route("todo_list", "/todo_list")
-    config.add_route("get_todo_list_items", "/api/get_todo_list_items")
-    config.add_route("add_todo_list_item", "/api/add_todo_list_item")
-    config.add_route("login", "/login")
-    config.add_route("post_login_credentials", "/api/post_login_credentials")
-    config.add_route("logout", "/logout")
+    config.add_route(name="home", path="/")
+    config.add_route(name="todo_list", path="/todo_list")
+    config.add_route(name="get_todo_list_items",
+                     path="/api/get_todo_list_items")
+    config.add_route(name="add_todo_list_item", path="/api/add_todo_list_item")
+    config.add_route(name="login", path="/login")
+    config.add_route(name="post_login_credentials",
+                     path="/api/post_login_credentials")
+    config.add_route(name="logout", path="/logout")
 
     return config.make_wsgi_app()

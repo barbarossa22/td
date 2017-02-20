@@ -13,7 +13,9 @@ import logging
 import os
 import pymongo
 
-from pyramid.httpexceptions import HTTPFound, HTTPForbidden, HTTPUnauthorized
+from pyramid.httpexceptions import (HTTPFound,
+                                    HTTPUnauthorized,
+                                    HTTPInternalServerError)
 from pyramid.response import FileResponse, Response
 from pyramid.security import remember, forget, authenticated_userid
 
@@ -52,10 +54,10 @@ def get_todo_list_page(request):
     """
     logger.debug("Get request for resource at /todo_list and replied with "
                  "file static/base.html")
-    abs_path_to_base = "".join([os.path.dirname(__file__),
-                                os.sep,
-                                os.path.join("static", "base.html")])
-    return FileResponse(abs_path_to_base, cache_max_age=3600)
+    abs_path_to_base = os.path.join(os.path.dirname(__file__),
+                                    "static",
+                                    "base.html")
+    return FileResponse(path=abs_path_to_base, cache_max_age=3600)
 
 
 def get_todo_list_items(request):
@@ -90,8 +92,15 @@ def get_todo_list_items(request):
     user_int_id = user_int_id[0]
 
     mongo_creds = settings["mongo_creds"]
-    client = pymongo.MongoClient(mongo_creds["host"],
-                                 int(mongo_creds["port"]))
+    try:
+        client = pymongo.MongoClient(mongo_creds["host"],
+                                     #int(mongo_creds["port"]))
+                                    27018)
+    except pymongo.errors.ConnectionFailure, error_msg:
+        logger.debug("Cannot connect to mongodb with given config "
+                     "credentials due to the next reason:"
+                     "\n%s", error_msg)
+        return HTTPInternalServerError()
     mongo_db = client[mongo_creds["db_name"]]
     items_collection = mongo_db.Items
     reply = items_collection.find({"owner_id": user_int_id},
@@ -156,10 +165,10 @@ def get_login_page(request):
     """
     logger.debug("Get request for resource at /login and replied with "
                  "file static/login.html")
-    abs_path_to_base = "".join([os.path.dirname(__file__),
-                                os.sep,
-                                os.path.join("static", "login.html")])
-    return FileResponse(abs_path_to_base, cache_max_age=3600)
+    abs_path_to_html_page = os.path.join(os.path.dirname(__file__),
+                                    "static",
+                                    "login.html")
+    return FileResponse(path=abs_path_to_html_page , cache_max_age=3600)
 
 
 def post_login_credentials(request):
@@ -180,9 +189,9 @@ def post_login_credentials(request):
     if query_output is not None:
         hashed_pword_from_db = query_output[0]
         if password_master.check_password(password, hashed_pword_from_db):
-            headers = remember(request, login)
+            headers = remember(request=request, userid=login)
             logger.debug("User %s has logged in right now.", login)
-            return HTTPFound("/todo_list", headers=headers)
+            return HTTPFound(location="/todo_list", headers=headers)
         else:
             logger.debug("Wrong password.")
             return HTTPUnauthorized()
