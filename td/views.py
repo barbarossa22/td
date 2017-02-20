@@ -94,7 +94,7 @@ def get_todo_list_items(request):
     mongo_creds = settings["mongo_creds"]
     try:
         client = pymongo.MongoClient(mongo_creds["host"],
-                                    27018)
+                                     int(mongo_creds["port"]))
     except pymongo.errors.ConnectionFailure, error_msg:
         logger.debug("Cannot connect to mongodb with given config "
                      "credentials due to the next reason:"
