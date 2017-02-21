@@ -19,11 +19,13 @@ from pyramid.httpexceptions import (HTTPFound,
                                     HTTPInternalServerError)
 from pyramid.response import FileResponse, Response
 from pyramid.security import authenticated_userid
+from pyramid.view import view_defaults
 
 
 logger = logging.getLogger(__name__)
 
 
+@view_defaults(permission="entry")
 class TodolistViews(object):
 
     def __init__(self, request):
