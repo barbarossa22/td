@@ -160,7 +160,7 @@ class TodolistViews(object):
         :returns: Response instance with 'OK' str body to indicate a success.
         :rtype: pyramid.response.Response
         """
-        id = ObjectId(self.request.json_body['id'])
+        _id = ObjectId(self.request.json_body['id'])
 
         settings = self.request.registry.settings
         mongo_creds = settings["mongo_creds"]
@@ -168,6 +168,6 @@ class TodolistViews(object):
                                      int(mongo_creds['port']))
         mongo_db = client[mongo_creds['db_name']]
         items_collection = mongo_db.Items
-        items_collection.delete_one({"_id": id})
-        logger.debug("Removing item from mongo db with id: %s", id)
+        items_collection.delete_one({"_id": _id})
+        logger.debug("Removing item from mongo db with id: %s", _id)
         return Response("OK")
