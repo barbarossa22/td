@@ -16,22 +16,12 @@ function get_items() {
 
     $.get("/api/get_todo_list_items", function(response) {
         $("#tasks_list").empty();
-
         if (response.items === null) {
-            if ($("#initial_info").length == 0) {
-                $("<p id='initial_info'>There are no tasks addded. \
-                  You can use panel above to do it!</p>")
-                    .appendTo("#tasks_panel");
-            }
+            append_initial_info();
         } else {
-            console.log("Response content has items and we can build our list!");
             for (var i=response.items.length-1; i>-1; i--) {
-                // if category in selected_chboxes_list append, no - good bye
-                if ($.inArray(response.items[i].category, active_categories_list) == -1) {
-                    console.log("No such category in the list of selected by \
-                                user categories to view.");
-                }
-                else {
+                // append item if it's category is in allowed active_categories_list
+                if ($.inArray(response.items[i].category, active_categories_list) != -1) {
                     var li = $(`<li data-id=${response.items[i].id}></li>`)
                         .html(escape_html_tag_syntax(response.items[i].item_value));
                     li.toggleClass(`${response.items[i].category}_li`);
@@ -42,6 +32,15 @@ function get_items() {
     });
 }
 
+function append_initial_info() {
+    // Append "There are no tasks added..." initial info text description
+    // paragraph to tasks panel.
+    if ($("#initial_info").length == 0) {
+        $("<p id='initial_info'>There are no tasks addded. \
+          You can use panel above to do it!</p>")
+            .appendTo("#tasks_panel");
+    }
+}
 
 function post_new_item() {
     // Function to be run when onclick event on save button is triggered.

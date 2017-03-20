@@ -132,5 +132,6 @@ def main(global_config, **settings):
     config.add_route(name="post_login_credentials",
                      path="/api/post_login_credentials")
     config.add_route(name="logout", path="/logout")
+    config.add_route(name="remove_item", path="/api/remove_item")
 
     return config.make_wsgi_app()
