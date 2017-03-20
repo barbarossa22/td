@@ -34,7 +34,6 @@ function get_items() {
 }
 
 
-
 function post_new_item() {
     // Function to be run when onclick event on save button is triggered.
     // - validate entered in input field data,
@@ -50,6 +49,7 @@ function post_new_item() {
     }
     category_name=$("#item_category_rbtns").find("input:radio[name='categories']:checked")[0].value;
     $.post("/api/add_todo_list_item", JSON.stringify({"item_value": input_value, "category": category_name }), function() {
+        // POST success function.
         $("#add_item_input").val(""); // clear input
         if ($("#initial_info").length) {
             // check if initial_info p exists and remove it after the moment when user adds new item to list
@@ -57,7 +57,12 @@ function post_new_item() {
         }
         $("#tasks_list").empty();
         get_items()
-    });
+    }).fail(
+        function(xhr, textStatus, errorThrown) {
+            // POST failure function.
+            alert("Server is unavailable, can't save your item. Try again.");
+        }
+    );
 }
 
 function draw_logout_btn() {
