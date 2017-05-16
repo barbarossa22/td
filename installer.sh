@@ -37,6 +37,13 @@ _ "for bcrypt python library.";
 _ "sudo apt-get install libffi-dev";
 sudo apt-get install libffi-dev
 
+_ "Install ruby and it's gem SaSS";
+_ "sudo apt-get install ruby;";
+sudo apt-get install ruby;
+_ "sudo gem install sass;";
+sudo gem install sass;
+
+
 ###
 _ "*** Setup databases*** ";
 ##
@@ -205,6 +212,9 @@ EOF
 
 _ "Your username is user and password is 1234.";
 
+_ "Compile stylesheets:";
+_ "sass td/static/sass:td/static/stylesheets";
+sass td/static/sass:td/static/stylesheets;
 
 ## Run
 

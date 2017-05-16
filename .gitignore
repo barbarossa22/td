@@ -8,3 +8,5 @@ __pycache__/*
 td.log
 build/*
 *~
+.sass-cache/
+td/static/stylesheets/

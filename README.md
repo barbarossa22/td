@@ -50,6 +50,12 @@ In order to make future installations of python's MySQLdb less painful and easy 
 
 `sudo apt-get install libmysqlclient-dev`
 
+Install ruby and it's gem SaSS:
+
+`sudo apt-get install ruby`
+
+`sudo gem install sass`
+
 ### Postgresql
 
 Get the Postgres package and a "contrib" package that adds some additional utilities and functionality:
@@ -165,6 +171,12 @@ or Mysql db:
 `insert into Users (id, ip, username, password, groups) values (1, '127.0.0.1', 'user', '$2b$12$/zC.07EVRZc3Qiyymhzcz.bWaJFKde0nepVpx6cZZowz0WQZ7Wp.W', 'group:users');`
 
 Your username is `user` and password is `1234`.
+
+#####Compile stylesheets:
+
+`sass --update td/static/sass:td/static/stylesheets`
+
+Also you can add `--watch` to force sass autodetect and compile css output immediately after any updates to sass code.
 
 #####Run
 

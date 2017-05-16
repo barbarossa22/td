@@ -5,6 +5,7 @@
 """
 
 import logging
+import pymongo
 
 from pyramid.authentication import AuthTktAuthenticationPolicy
 from pyramid.authorization import ACLAuthorizationPolicy
@@ -37,8 +38,10 @@ def main(global_config, **settings):
     db_engine_type_in_use = settings["db_in_use"]
     db_creds = parser.get_subsection_in_section(db_engine_type_in_use, "databases")
 
-    settings["mongo_creds"] = parser.get_subsection_in_section("mongo",
-                                                               "databases")
+    mongo_creds = parser.get_subsection_in_section("mongo", "databases")
+    client = pymongo.MongoClient(mongo_creds['host'],
+                                 int(mongo_creds['port']))
+    mongo_db = client[mongo_creds["db_name"]]
 
     db = Connector(db_engine_type_in_use, db_creds)
 
@@ -46,13 +49,15 @@ def main(global_config, **settings):
         """Serve as decorator specified in config.add_view for db connections
         creation.
 
-        Inserts Connector's instance in request.registry.settings.db.
+        Inserts Connector's instance and Mongodb Database instance in
+        request.registry.settings.db
 
         :param view_to_wrap: View func to extend.
-        :return: Wrapped view func with injected db instance in it's request.
+        :return: Wrapped view func with injected db instances in it's request.
         """
         def wrapper(context, request):
             request.registry.settings["db"] = db
+            request.registry.settings["mongo_db"] = mongo_db
             response = view_to_wrap(context, request)
             return response
         return wrapper
