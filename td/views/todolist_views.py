@@ -11,12 +11,9 @@
 
 import logging
 import os
-import pymongo
 
 from bson import ObjectId
-from pyramid.httpexceptions import (HTTPFound,
-                                    HTTPUnauthorized,
-                                    HTTPInternalServerError)
+from pyramid.httpexceptions import HTTPFound,  HTTPUnauthorized
 from pyramid.response import FileResponse, Response
 from pyramid.security import authenticated_userid
 from pyramid.view import view_defaults
@@ -90,16 +87,7 @@ class TodolistViews(object):
         # extract id integer from tuple like (2,)[0] -> 2
         user_int_id = user_int_id[0]
 
-        mongo_creds = settings["mongo_creds"]
-        try:
-            client = pymongo.MongoClient(mongo_creds["host"],
-                                         int(mongo_creds["port"]))
-        except pymongo.errors.ConnectionFailure, error_msg:
-            logger.debug("Cannot connect to mongodb with given config "
-                         "credentials due to the next reason:"
-                         "\n%s", error_msg)
-            return HTTPInternalServerError()
-        mongo_db = client[mongo_creds["db_name"]]
+        mongo_db = settings["mongo_db"]
         items_collection = mongo_db.Items
         reply = items_collection.find({"owner_id": user_int_id},
                                       {"item_value": 1,
@@ -143,10 +131,7 @@ class TodolistViews(object):
             return HTTPUnauthorized()
         # extract id integer from tuple like (2,)[0] -> 2
         user_int_id = user_int_id[0]
-        mongo_creds = settings["mongo_creds"]
-        client = pymongo.MongoClient(mongo_creds['host'],
-                                     int(mongo_creds['port']))
-        mongo_db = client[mongo_creds['db_name']]
+        mongo_db = settings["mongo_db"]
         items_collection = mongo_db.Items
         items_collection.insert_one({"item_value": self.request.json_body["item_value"],
                                      "category": self.request.json_body["category"],
@@ -165,10 +150,7 @@ class TodolistViews(object):
         _id = ObjectId(self.request.json_body['id'])
 
         settings = self.request.registry.settings
-        mongo_creds = settings["mongo_creds"]
-        client = pymongo.MongoClient(mongo_creds['host'],
-                                     int(mongo_creds['port']))
-        mongo_db = client[mongo_creds['db_name']]
+        mongo_db = settings["mongo_db"]
         items_collection = mongo_db.Items
         items_collection.delete_one({"_id": _id})
         logger.debug("Removing item from mongo db with id: %s", _id)
