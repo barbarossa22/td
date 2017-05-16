@@ -11,8 +11,8 @@
 
 import logging
 import os
-import pymongo
 
+from bson import ObjectId
 from pyramid.httpexceptions import (HTTPFound,
                                     HTTPUnauthorized,
                                     HTTPInternalServerError)
@@ -94,21 +94,14 @@ def get_todo_list_items(request):
     # extract id integer from tuple like (2,)[0] -> 2
     user_int_id = user_int_id[0]
 
-    mongo_creds = settings["mongo_creds"]
-    try:
-        client = pymongo.MongoClient(mongo_creds["host"],
-                                     int(mongo_creds["port"]))
-    except pymongo.errors.ConnectionFailure, error_msg:
-        logger.debug("Cannot connect to mongodb with given config "
-                     "credentials due to the next reason:"
-                     "\n%s", error_msg)
-        return HTTPInternalServerError()
-    mongo_db = client[mongo_creds["db_name"]]
+    mongo_db = settings["mongo_db"]
     items_collection = mongo_db.Items
+
     reply = items_collection.find({"owner_id": user_int_id},
-                                  {"item_value": 1, "category": 1, "_id": 0})
+                                  {"item_value": 1, "category": 1, "_id": 1})
     items = [{"item_value": document["item_value"],
-              "category": document["category"]}
+              "category": document["category"],
+              "id": str(document["_id"])}
              for document in reply]
     if len(items) == 0:
         logger.debug("Items for this user don't exist, reply with "
@@ -145,10 +138,7 @@ def add_todo_list_item(request):
         return HTTPUnauthorized()
     # extract id integer from tuple like (2,)[0] -> 2
     user_int_id = user_int_id[0]
-    mongo_creds = settings["mongo_creds"]
-    client = pymongo.MongoClient(mongo_creds['host'],
-                                 int(mongo_creds['port']))
-    mongo_db = client[mongo_creds['db_name']]
+    mongo_db = settings["mongo_db"]
     items_collection = mongo_db.Items
     items_collection.insert_one({"item_value": request.json_body["item_value"],
                                  "category": request.json_body["category"],
@@ -156,6 +146,24 @@ def add_todo_list_item(request):
     logger.debug("Successfully added item '%s' to the database.",
                  request.json_body["item_value"])
 
+    return Response("OK")
+
+
+def remove_item(request):
+    """Delete item from database by id.
+
+    :param request: instance-object which represents HTTP request.
+    :type request: pyramid.request.Request
+    :returns: Response instance with 'OK' str body to indicate a success.
+    :rtype: pyramid.response.Response
+    """
+    item_id = ObjectId(request.json_body['id'])
+
+    settings = request.registry.settings
+    mongo_db = settings["mongo_db"]
+    items_collection = mongo_db.Items
+    items_collection.delete_one({"_id": item_id})
+    logger.debug("Removing item from mongo db with id: %s", item_id)
     return Response("OK")
 
 
@@ -170,9 +178,9 @@ def get_login_page(request):
     logger.debug("Get request for resource at /login and replied with "
                  "file static/login.html")
     abs_path_to_html_page = os.path.join(os.path.dirname(__file__),
-                                    "static",
-                                    "login.html")
-    return FileResponse(path=abs_path_to_html_page , cache_max_age=3600)
+                                         "static",
+                                         "login.html")
+    return FileResponse(path=abs_path_to_html_page, cache_max_age=3600)
 
 
 def post_login_credentials(request):
@@ -184,7 +192,6 @@ def post_login_credentials(request):
     """
     login = request.json_body["login"]
     password = request.json_body["password"]
-    ip = request.client_addr
     password_master = PasswordMaster()
 
     db = request.registry.settings["db"]

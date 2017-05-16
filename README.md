@@ -174,7 +174,7 @@ Your username is `user` and password is `1234`.
 
 #####Compile stylesheets:
 
-`sass td/static/sass:td/static/stylesheets`
+`sass --update td/static/sass:td/static/stylesheets`
 
 Also you can add `--watch` to force sass autodetect and compile css output immediately after any updates to sass code.
 
