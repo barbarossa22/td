@@ -140,7 +140,7 @@ Use `deactivate` to exit current virtual environ, `lsvirtualenv` and `rmvirtuale
 
 ## Pyramid app setup and start
 
-#####Install Python dependancies
+##### Install Python dependancies
 
 If you're not in the project's dir cd to it and then invoke command, which installs the project in development mode (-e is for "editable") into the current directory (.):
 
@@ -150,7 +150,7 @@ It is just pip wrapping on `python setup.py develop`, so you can use it too.
 
 When you add new dependancies to the project the updates can be installed through usage of next commands: `pip install -e .` or `python setup.py develop` or `pip install -r requirements.txt`. The last one is the fastest way.
 
-#####Create user to login the app.
+##### Create user to login the app.
 
 Postgres db:
 
@@ -172,13 +172,13 @@ or Mysql db:
 
 Your username is `user` and password is `1234`.
 
-#####Compile stylesheets:
+##### Compile stylesheets:
 
 `sass --update td/static/sass:td/static/stylesheets`
 
 Also you can add `--watch` to force sass autodetect and compile css output immediately after any updates to sass code.
 
-#####Run
+##### Run
 
 Run the application with needed configuration file:
 
@@ -213,6 +213,6 @@ To get info about coverage:
 
 You can use Sphinx to autogenerate html with code documentation. Make build from source files with (cd to project's root directory, if you're not there):
 
-`sphinx-build -b html source build`
+`sphinx-build -b html sphinx_docs_source docs`
 
-Now it's possible to read the docs opening them in `build/index.html` and then surfing in the browser through the pages.
+Now it's possible to read the docs opening them in `docs/index.html` and then surfing in the browser through the pages.

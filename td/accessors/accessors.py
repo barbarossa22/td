@@ -1,7 +1,7 @@
 """
-.. module:: assessors
+.. module:: accessors
    :platform: Unix
-   :synopsis: Database assessors.
+   :synopsis: Database accessors.
 
 .. moduleauthor:: Mykola Radionov <moodaq@gmail.com>
 
@@ -15,7 +15,7 @@ import psycopg2
 from td.exceptions import WrongEngineException
 
 
-class Assessor:
+class Accessor:
     """Return the resource of db connection """
 
     def __enter__(self):
@@ -29,7 +29,7 @@ class Assessor:
         try:
             return self.db
         except AttributeError:
-            error_message = ("You can only derive from Assesor class and then "
+            error_message = ("You can only derive from Accesor class and then "
                              "use it's descendant as a context-manager!")
             raise NotImplementedError(error_message)
 
@@ -38,7 +38,7 @@ class Assessor:
         self.db.close()
 
 
-class MySQLDbAssessor(Assessor):
+class MySQLDbAccessor(Accessor):
     """Context-manager for MySQLdb connection to the database."""
     def __init__(self, host, user, password, db_name):
         """Initialize context-manager call with credentials.
@@ -64,7 +64,7 @@ class MySQLDbAssessor(Assessor):
                                   self.db_name)
 
 
-class PgresDbAssessor(Assessor):
+class PgresDbAccessor(Accessor):
     """Context-manager for psycopg2 connection to the database."""
     def __init__(self, db_name, user, host, password):
         """Initialize context-manager call with credentials.
@@ -100,7 +100,7 @@ class Connector(object):
 
     Three public methods available: select_one, select_all and insert which
     send queries to the database server establishing connection with it
-    using MySQLDbAssessor and PgresDbAssessor drivers as context managers for
+    using MySQLDbAccessor and PgresDbAccessor drivers as context managers for
     each single request.
     """
 
@@ -211,7 +211,7 @@ class Connector(object):
         :return: tuple with fetched data from selected query.
         :rtype: tuple
         """
-        with MySQLDbAssessor(self.__credentials_dict["host"],
+        with MySQLDbAccessor(self.__credentials_dict["host"],
                              self.__credentials_dict["user"],
                              self.__credentials_dict["password"],
                              self.__credentials_dict["db_name"]) as db:
@@ -259,7 +259,7 @@ class Connector(object):
         :return: tuple with fetched data from selected query.
         :rtype: tuple
         """
-        with PgresDbAssessor(self.__credentials_dict["db_name"],
+        with PgresDbAccessor(self.__credentials_dict["db_name"],
                              self.__credentials_dict["user"],
                              self.__credentials_dict["host"],
                              self.__credentials_dict["password"]) as db:
@@ -298,15 +298,15 @@ class Connector(object):
         """
 
         if self.engine_type == "mysql":
-            assessor = MySQLDbAssessor
+            accessor = MySQLDbAccessor
             query_template = "INSERT INTO %s(%s) VALUES %s"
         elif self.engine_type == "postgres":
-            assessor = PgresDbAssessor
+            accessor = PgresDbAccessor
             query_template = 'INSERT INTO "%s"(%s) VALUES %s'
         else:
             raise WrongEngineException(self.ERROR_MESSAGE)
 
-        with assessor(db_name=self.__credentials_dict["db_name"],
+        with accessor(db_name=self.__credentials_dict["db_name"],
                       user=self.__credentials_dict["user"],
                       host=self.__credentials_dict["host"],
                       password=self.__credentials_dict["password"]) as db:

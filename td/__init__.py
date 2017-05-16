@@ -12,7 +12,7 @@ from pyramid.authorization import ACLAuthorizationPolicy
 from pyramid.config import Configurator
 from pyramid.security import Allow, Everyone
 
-from td.assessors.assessors import Connector
+from td.accessors.accessors import Connector
 from td.config import ConfigScanner
 
 logger = logging.getLogger(__name__)
@@ -93,40 +93,46 @@ def main(global_config, **settings):
     config.add_static_view(name="static",
                            path="td:static",
                            cache_max_age=3600)
-    config.add_forbidden_view(view="td.views.forbidden_view")
+    config.add_forbidden_view(view="td.views.auth_views.AuthViews",
+                              attr="forbidden_view")
 
-    config.add_view(view="td.views.home",
-                    route_name="home",
-                    permission="entry")
-    config.add_view(view="td.views.get_todo_list_page",
+    config.add_view(view="td.views.todolist_views.TodolistViews",
+                    attr="home",
+                    route_name="home")
+    config.add_view(view="td.views.todolist_views.TodolistViews",
+                    attr="get_todo_list_page",
                     route_name="todo_list",
-                    request_method="GET",
-                    permission="entry")
-    config.add_view(view="td.views.get_todo_list_items",
+                    request_method="GET")
+    config.add_view(view="td.views.todolist_views.TodolistViews",
+                    attr="get_todo_list_items",
                     route_name="get_todo_list_items",
                     renderer="json",
                     xhr=True,
                     request_method="GET",
-                    decorator=connect_db_to_view,
-                    permission="entry")
-    config.add_view(view="td.views.add_todo_list_item",
+                    decorator=connect_db_to_view)
+    config.add_view(view="td.views.todolist_views.TodolistViews",
+                    attr="add_todo_list_item",
                     route_name="add_todo_list_item",
                     xhr=True,
                     request_method="POST",
-                    decorator=connect_db_to_view,
-                    permission="entry")
-    config.add_view(view="td.views.get_login_page",
+                    decorator=connect_db_to_view)
+    config.add_view("td.views.todolist_views.TodolistViews",
+                    attr="remove_item",
+                    route_name="remove_item",
+                    request_method="POST")
+    config.add_view(view="td.views.auth_views.AuthViews",
+                    attr="get_login_page",
                     route_name="login",
                     request_method="GET")
-    config.add_view(view="td.views.post_login_credentials",
+    config.add_view(view="td.views.auth_views.AuthViews",
+                    attr="post_login_credentials",
                     route_name="post_login_credentials",
                     xhr=True,
                     request_method="POST",
                     decorator=connect_db_to_view)
-    config.add_view(view="td.views.logout",
+    config.add_view(view="td.views.auth_views.AuthViews",
+                    attr="logout",
                     route_name="logout")
-    config.add_view(view="td.views.remove_item",
-                    route_name="remove_item")
 
     config.add_route(name="home", path="/")
     config.add_route(name="todo_list", path="/todo_list")
