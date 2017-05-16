@@ -2,27 +2,52 @@
 <html>
 <head>
     <meta charset="UTF-8" name="viewport" content="width=device-width, initial-scale=1">
-    <title>Test</title>
+    <title>To-do list</title>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css" integrity="sha384-rwoIResjU2yc3z8GV/NPeZWAv56rSmLldC3R/AZzGRnGxQQKnKkoFVhFQhNUwEyJ" crossorigin="anonymous">
-    <link rel="stylesheet" href="static/style.css" />
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css"
+    <link rel="stylesheet" href="static/stylesheets/todo_list.css" />
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" />
 </head>
 
 <body>
-    <div id="main">
+    <div id="main" class="col-sm-12">
         <div id="add_item_panel" class="input-group">
             <input id="add_item_input" type="text" class="form-control"/>
-            <span class="input-group-btn">
+            <div class="input-group-btn">
+                <button type="button" class="btn btn-secondary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
+                <div class="dropdown-menu" id="item_category_rbtns">
+                    <span class="dropdown-item"><input name="categories" type="radio" value="red" id="red_rbtn" checked/> Red</span>
+                    <span class="dropdown-item"><input name="categories" type="radio" value="yellow" id="yellow_rbtn"/> Yellow</span>
+                    <span class="dropdown-item"><input name="categories" type="radio" value="green" id="green_rbtn"/> Green</span>
+                </div>
+            </div>
+            <div class="input-group-btn">
                 <button id="add_item_submit" class="btn btn-secondary" type="button" onclick=post_new_item()>save</button>
-            </span>
+            </div>
         </div>
+
+        <div class="btn-group" id="category_checkboxes" data-toggle="buttons">
+            <label class="btn red-btn active">
+                <input type="checkbox" value="red" checked="" onchange="get_items()">
+                Red
+            </label>
+            <label class="btn yellow-btn active">
+                <input type="checkbox" value="yellow" checked="" onchange="get_items()">
+                Yellow
+            </label>
+            <label class="btn green-btn active">
+                <input type="checkbox" value="green" checked="" onchange="get_items()">
+                Green
+            </label>
+        </div>
+
         <div id="tasks_panel">
-            <ul id="tasks_list">
-            </ul>
+            <ul id="tasks_list"></ul>
         </div>
     </div>
-    <script src="//oss.maxcdn.com/libs/jquery/1.10.2/jquery.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
     <script src="static/todo_list_script.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tether/1.4.0/js/tether.min.js" integrity="sha384-DztdAPBWPRXSA/3eYEEUWrWCy7G5KFbe8fFjk5JAIxUYHKkDx6Qin1DkWx51bBrb" crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/js/bootstrap.min.js" integrity="sha384-vBWWzlZJ8ea9aCX4pEW3rVHjgjt7zpkNpZk+02D9phzyeVkE+jo0ieGizqPLForn" crossorigin="anonymous"></script>
 </body>
 
 </html>
