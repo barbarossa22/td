@@ -12,7 +12,7 @@ from pyramid.authorization import ACLAuthorizationPolicy
 from pyramid.config import Configurator
 from pyramid.security import Allow, Everyone
 
-from td.assessors.assessors import Connector
+from td.accessors.accessors import Connector
 from td.config import ConfigScanner
 
 logger = logging.getLogger(__name__)
