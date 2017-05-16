@@ -24,6 +24,8 @@ logger = logging.getLogger(__name__)
 
 @view_defaults(permission="entry")
 class TodolistViews(object):
+    """Main todolist app views.
+    """
 
     def __init__(self, request):
         self.request = request
@@ -31,7 +33,7 @@ class TodolistViews(object):
     def home(self):
         """Redirect from / to /todo_list url.
 
-        :returns: HTTPFound exception as response object with status code 302.
+        :return: HTTPFound exception as response object with status code 302.
         :rtype: pyramid.httpexceptions.HTTPFound
         """
         logger.debug("Get request for the resource at / and redirected to "
@@ -41,7 +43,7 @@ class TodolistViews(object):
     def get_todo_list_page(self):
         """Return static/base.html at request on /todo_list url.
 
-        :returns: object that is used to serve a file from static/base.html.
+        :return: object that is used to serve a file from static/base.html.
         :rtype: pyramid.response.FileResponse
 
         """
@@ -57,7 +59,7 @@ class TodolistViews(object):
         """Get JSON with list of todo-items from Mongo database at request on
         /api/get_todo_list_items url.
 
-        :returns: dict that is later transformed by json-renderer into response
+        :return: dict that is later transformed by json-renderer into response
         object with included JSON-serialized string made from this dict:
 
         * {'items': [{'item_value': 'sleep', 'category': 'green'},
@@ -112,7 +114,7 @@ class TodolistViews(object):
         function checks if user's id exists in the Postgres database table
         'Users'. If no then raises HTTPUnauthorized.
 
-        :returns: Response instance with 'OK' str body to indicate a success.
+        :return: Response instance with 'OK' str body to indicate a success.
         :rtype: pyramid.response.Response
 
         """
@@ -144,7 +146,7 @@ class TodolistViews(object):
     def remove_item(self):
         """Delete item from database by id.
 
-        :returns: Response instance with 'OK' str body to indicate a success.
+        :return: Response instance with 'OK' str body to indicate a success.
         :rtype: pyramid.response.Response
         """
         _id = ObjectId(self.request.json_body['id'])

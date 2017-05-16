@@ -23,6 +23,8 @@ logger = logging.getLogger(__name__)
 
 
 class AuthViews(object):
+    """Authentication views.
+    """
 
     def __init__(self, request):
         self.request = request
@@ -39,7 +41,7 @@ class AuthViews(object):
     def get_login_page(self):
         """Return static/login.html at request on /login url.
 
-        :returns: object that is used to serve a file from static/login.html.
+        :return: object that is used to serve a file from static/login.html.
         :rtype: pyramid.response.FileResponse
         """
         logger.debug("Get request for resource at /login and replied with "
@@ -52,8 +54,9 @@ class AuthViews(object):
     def post_login_credentials(self):
         """Accept POST request with login and password from the client.
 
-        :returns: if ok HTTPFound with auth. headers in response else
+        :return: if ok HTTPFound with auth. headers in response else
         HTTPUnauthorized.
+
         :rtype: pyramid.httpexceptions.HTTPFound
         """
         login = self.request.json_body["login"]
@@ -79,7 +82,7 @@ class AuthViews(object):
     def logout(self):
         """Logout user.
 
-        :returns: HTTPFound exception as response object with status code 302.
+        :return: HTTPFound exception as response object with status code 302.
         :rtype: pyramid.httpexceptions.HTTPFound
         """
         headers = forget(self.request)

@@ -213,6 +213,6 @@ To get info about coverage:
 
 You can use Sphinx to autogenerate html with code documentation. Make build from source files with (cd to project's root directory, if you're not there):
 
-`sphinx-build -b html source build`
+`sphinx-build -b html sphinx_docs_source docs`
 
-Now it's possible to read the docs opening them in `build/index.html` and then surfing in the browser through the pages.
+Now it's possible to read the docs opening them in `docs/index.html` and then surfing in the browser through the pages.
