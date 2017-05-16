@@ -63,6 +63,7 @@ function post_new_item() {
     $.post("/api/add_todo_list_item",
            JSON.stringify({"item_value": input_value, "category": category_name }),
             function() {
+                // POST success function.
                 $("#add_item_input").val(""); // clear input
                 if ($("#initial_info").length) {
                     // Check if initial_info p exists and remove it after the
@@ -72,6 +73,11 @@ function post_new_item() {
                 $("#tasks_list").empty();
                 get_items()
             }
+          ).fail(
+              function(xhr, textStatus, errorThrown) {
+                  // POST failure function.
+                  alert("Server is unavailable, can't save your item. Try again.");
+              }
           );
 }
 
